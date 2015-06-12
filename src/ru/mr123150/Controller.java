@@ -1,5 +1,6 @@
 package ru.mr123150;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -65,7 +66,9 @@ public class Controller implements Initializable{
                             Socket s=ss.accept();
                             DataInputStream in=new DataInputStream(s.getInputStream());
                             //System.out.println(in.readUTF());
-                            receive(in.readUTF());
+                            Platform.runLater(()->{
+                                try{receive(in.readUTF());}
+                                catch(Exception e){e.printStackTrace();}});
                         }
                         catch(Exception e){
                             e.printStackTrace();
@@ -128,6 +131,7 @@ public class Controller implements Initializable{
     }
 
     public void receive(String str){
+        System.out.println(str);
         String arr[]=str.split(";");
         switch(arr[0]){
             case "CLICK":
