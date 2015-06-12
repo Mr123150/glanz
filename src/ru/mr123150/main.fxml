@@ -5,7 +5,7 @@
 <BorderPane fx:controller="ru.mr123150.Controller" fx:id="rootPane" xmlns:fx="http://javafx.com/fxml">
     <top>
         <HBox>
-            <Button onAction="#testClick" text="Test"/>
+            <Button onAction="#connect" text="Connect"/>
         </HBox>
     </top>
     <center>

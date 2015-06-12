@@ -1,5 +1,6 @@
 package ru.mr123150;
 
+import javafx.concurrent.Task;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -8,6 +9,11 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -15,6 +21,9 @@ public class Controller implements Initializable{
     @FXML Canvas canvas;
     @FXML BorderPane rootPane;
     GraphicsContext gc;
+
+    ServerSocket ss = null;
+    Socket clientSocket = null;
 
     @Override
     public void initialize(URL url, ResourceBundle rb){
@@ -41,10 +50,36 @@ public class Controller implements Initializable{
             gc.lineTo(event.getX(), event.getY());
             gc.stroke();
         });
-    }
 
-    @FXML private void testClick(Event e){
-        System.out.println(rootPane.getWidth());
+        try{
+            ss=new ServerSocket(5050);
+            boolean true_true=true;
+            Task task=new Task<Void>(){
+                @Override protected Void call(){
+                    while(true_true){
+                        try{
+                            Socket s=ss.accept();
+                            DataInputStream in=new DataInputStream(s.getInputStream());
+                            System.out.println(in.readUTF());
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                            break;
+                        }
+                    }
+                    return null;
+                }
+            };
+
+            Thread th=new Thread(task);
+            th.setDaemon(true);
+            th.start();
+
+        }
+
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void resizeCanvas(double width, double height){
@@ -59,5 +94,18 @@ public class Controller implements Initializable{
         gc.lineTo(0,0);
         gc.closePath();
         gc.stroke();
+    }
+
+    @FXML public void connect(){
+        try{
+            clientSocket=new Socket("127.0.0.1",5050);
+            OutputStream out=clientSocket.getOutputStream();
+            DataOutputStream os=new DataOutputStream(out);
+            os.writeUTF("test");
+            clientSocket.close();
+        }
+        catch (Exception e){
+
+        }
     }
 }
