@@ -24,6 +24,7 @@ public class Controller implements Initializable{
 
     ServerSocket ss = null;
     Socket clientSocket = null;
+    DataOutputStream os = null;
 
     @Override
     public void initialize(URL url, ResourceBundle rb){
@@ -39,16 +40,19 @@ public class Controller implements Initializable{
 
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED,event->{
             gc.fillOval(event.getX(), event.getY(), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
+            send("CLICK",event.getX(),event.getY());
         });
 
         canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
             gc.beginPath();
             gc.moveTo(event.getX(), event.getY());
+            send("PRESS",event.getX(),event.getY());
         });
 
         canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
             gc.lineTo(event.getX(), event.getY());
             gc.stroke();
+            send("DRAG",event.getX(),event.getY());
         });
 
         try{
@@ -98,14 +102,27 @@ public class Controller implements Initializable{
 
     @FXML public void connect(){
         try{
-            clientSocket=new Socket("127.0.0.1",5050);
+            clientSocket=new Socket("192.168.0.100",5050);
             OutputStream out=clientSocket.getOutputStream();
-            DataOutputStream os=new DataOutputStream(out);
-            os.writeUTF("test");
-            clientSocket.close();
+            os=new DataOutputStream(out);
+            os.writeUTF("connect");
         }
         catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
+    public void send(String status,double x, double y){
+        if(clientSocket!=null){
+            try {
+                clientSocket=new Socket("192.168.0.100",5050);
+                OutputStream out=clientSocket.getOutputStream();
+                os=new DataOutputStream(out);
+                os.writeUTF(status + ";" + x + ";" + y);
+            }
+            catch(Exception e){
+                e.printStackTrace();
+            }
         }
     }
 }
