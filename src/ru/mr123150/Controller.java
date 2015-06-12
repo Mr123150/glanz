@@ -64,7 +64,8 @@ public class Controller implements Initializable{
                         try{
                             Socket s=ss.accept();
                             DataInputStream in=new DataInputStream(s.getInputStream());
-                            System.out.println(in.readUTF());
+                            //System.out.println(in.readUTF());
+                            receive(in.readUTF());
                         }
                         catch(Exception e){
                             e.printStackTrace();
@@ -95,7 +96,7 @@ public class Controller implements Initializable{
         gc.lineTo(canvas.getWidth(), 0);
         gc.lineTo(canvas.getWidth(), canvas.getHeight());
         gc.lineTo(0, canvas.getHeight());
-        gc.lineTo(0,0);
+        gc.lineTo(0, 0);
         gc.closePath();
         gc.stroke();
     }
@@ -123,6 +124,25 @@ public class Controller implements Initializable{
             catch(Exception e){
                 e.printStackTrace();
             }
+        }
+    }
+
+    public void receive(String str){
+        String arr[]=str.split(";");
+        switch(arr[0]){
+            case "CLICK":
+                gc.fillOval(Double.parseDouble(arr[1]), Double.parseDouble(arr[2]), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
+                break;
+            case "PRESS":
+                gc.beginPath();
+                gc.moveTo(Double.parseDouble(arr[1]), Double.parseDouble(arr[2]));
+                break;
+            case "DRAG":
+                gc.lineTo(Double.parseDouble(arr[1]), Double.parseDouble(arr[2]));
+                gc.stroke();
+                break;
+            default:
+                break;
         }
     }
 }
