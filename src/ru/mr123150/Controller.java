@@ -2,13 +2,13 @@ package ru.mr123150;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import ru.mr123150.conn.Connection;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -55,20 +55,46 @@ public class Controller implements Initializable{
             gc.stroke();
             send("DRAG",event.getX(),event.getY());
         });
+    }
 
+    public void resizeCanvas(double width, double height){
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        canvas.setWidth(width);
+        canvas.setHeight(height);
+        gc.beginPath();
+        gc.moveTo(0, 0);
+        gc.lineTo(canvas.getWidth(), 0);
+        gc.lineTo(canvas.getWidth(), canvas.getHeight());
+        gc.lineTo(0, canvas.getHeight());
+        gc.lineTo(0, 0);
+        gc.closePath();
+        gc.stroke();
+    }
+
+    @FXML public void connect(){
+        try{
+            clientSocket=new Socket("192.168.0.115",5050);
+            OutputStream out=clientSocket.getOutputStream();
+            os=new DataOutputStream(out);
+            os.writeUTF("CONNECT");
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @FXML public void host(){
         try{
             ss=new ServerSocket(5050);
-            boolean true_true=true;
             Task task=new Task<Void>(){
                 @Override protected Void call(){
-                    while(true_true){
+                    while(true){
                         try{
                             Socket s=ss.accept();
                             DataInputStream in=new DataInputStream(s.getInputStream());
+                            String str=in.readUTF();
                             //System.out.println(in.readUTF());
-                            Platform.runLater(()->{
-                                try{receive(in.readUTF());}
-                                catch(Exception e){e.printStackTrace();}});
+                            Platform.runLater(()->{receive(str);});
                         }
                         catch(Exception e){
                             e.printStackTrace();
@@ -90,36 +116,10 @@ public class Controller implements Initializable{
         }
     }
 
-    public void resizeCanvas(double width, double height){
-        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        canvas.setWidth(width);
-        canvas.setHeight(height);
-        gc.beginPath();
-        gc.moveTo(0, 0);
-        gc.lineTo(canvas.getWidth(), 0);
-        gc.lineTo(canvas.getWidth(), canvas.getHeight());
-        gc.lineTo(0, canvas.getHeight());
-        gc.lineTo(0, 0);
-        gc.closePath();
-        gc.stroke();
-    }
-
-    @FXML public void connect(){
-        try{
-            clientSocket=new Socket("192.168.0.100",5050);
-            OutputStream out=clientSocket.getOutputStream();
-            os=new DataOutputStream(out);
-            os.writeUTF("connect");
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
     public void send(String status,double x, double y){
         if(clientSocket!=null){
             try {
-                clientSocket=new Socket("192.168.0.100",5050);
+                clientSocket=new Socket("192.168.0.115",5050);
                 OutputStream out=clientSocket.getOutputStream();
                 os=new DataOutputStream(out);
                 os.writeUTF(status + ";" + x + ";" + y);
