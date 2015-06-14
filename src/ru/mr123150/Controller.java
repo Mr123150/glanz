@@ -27,6 +27,8 @@ public class Controller implements Initializable{
     Socket clientSocket = null;
     DataOutputStream os = null;
 
+    Connection conn=null;
+
     @Override
     public void initialize(URL url, ResourceBundle rb){
         gc= canvas.getGraphicsContext2D();
@@ -41,19 +43,19 @@ public class Controller implements Initializable{
 
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED,event->{
             gc.fillOval(event.getX(), event.getY(), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
-            send("CLICK",event.getX(),event.getY());
+            if(conn!=null)conn.send("CLICK;"+event.getX()+";"+event.getY());
         });
 
         canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
             gc.beginPath();
             gc.moveTo(event.getX(), event.getY());
-            send("PRESS",event.getX(),event.getY());
+            if(conn!=null)conn.send("PRESS;"+event.getX()+";"+event.getY());
         });
 
         canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
             gc.lineTo(event.getX(), event.getY());
             gc.stroke();
-            send("DRAG",event.getX(),event.getY());
+            if(conn!=null)conn.send("DRAG;"+event.getX()+";"+event.getY());
         });
     }
 
@@ -73,10 +75,8 @@ public class Controller implements Initializable{
 
     @FXML public void connect(){
         try{
-            clientSocket=new Socket("192.168.0.115",5050);
-            OutputStream out=clientSocket.getOutputStream();
-            os=new DataOutputStream(out);
-            os.writeUTF("CONNECT");
+            conn=new Connection("192.168.0.100",5050);
+            conn.send("CONNECT");
         }
         catch (Exception e){
             e.printStackTrace();
@@ -85,15 +85,13 @@ public class Controller implements Initializable{
 
     @FXML public void host(){
         try{
-            ss=new ServerSocket(5050);
+            conn=new Connection(5050);
+            System.out.println("SERVER STARTED");
             Task task=new Task<Void>(){
                 @Override protected Void call(){
                     while(true){
                         try{
-                            Socket s=ss.accept();
-                            DataInputStream in=new DataInputStream(s.getInputStream());
-                            String str=in.readUTF();
-                            //System.out.println(in.readUTF());
+                            String str=conn.receive();
                             Platform.runLater(()->{receive(str);});
                         }
                         catch(Exception e){
@@ -113,20 +111,6 @@ public class Controller implements Initializable{
 
         catch (Exception e){
             e.printStackTrace();
-        }
-    }
-
-    public void send(String status,double x, double y){
-        if(clientSocket!=null){
-            try {
-                clientSocket=new Socket("192.168.0.115",5050);
-                OutputStream out=clientSocket.getOutputStream();
-                os=new DataOutputStream(out);
-                os.writeUTF(status + ";" + x + ";" + y);
-            }
-            catch(Exception e){
-                e.printStackTrace();
-            }
         }
     }
 

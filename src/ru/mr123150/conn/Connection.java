@@ -13,9 +13,6 @@ public class Connection{
     protected boolean isHost;
 
     ServerSocket ss = null;
-    Socket socket = null;
-
-    Thread th=null;
 
     public Connection(int port) throws IOException{
         this.host=null;
@@ -28,15 +25,10 @@ public class Connection{
         this.host=host;
         this.port=port;
         isHost=false;
-        socket=new Socket(host,port);
     }
 
     public boolean isHost(){
         return isHost;
-    }
-
-    public int getPort(){
-        return port;
     }
 
     public void send(String msg) {
@@ -46,11 +38,11 @@ public class Connection{
             Socket s;
             if (isHost){
                 s = ss.accept();
-                out = new DataOutputStream(socket.getOutputStream());
+                out = new DataOutputStream(s.getOutputStream());
             }
             else{
                 s = new Socket(host, port);
-                OutputStream os = socket.getOutputStream();
+                OutputStream os = s.getOutputStream();
                 out = new DataOutputStream(os);
             }
             out.writeUTF(msg);
@@ -66,14 +58,15 @@ public class Connection{
         DataInputStream in;
         if(isHost){
             s=ss.accept();
-            in=new DataInputStream(socket.getInputStream());
+            in=new DataInputStream(s.getInputStream());
         }
         else{
             s=new Socket(host,port);
-            InputStream is=socket.getInputStream();
+            InputStream is=s.getInputStream();
             in=new DataInputStream(is);
         }
+        String str=in.readUTF();
         s.close();
-        return in.readUTF();
+        return str;
     }
 }
