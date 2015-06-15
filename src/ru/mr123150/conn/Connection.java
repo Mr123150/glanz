@@ -27,13 +27,6 @@ public class Connection{
         isHost=false;
     }
 
-    public Connection(int port, boolean isHost) throws IOException{
-        this.host=null;
-        this.port=port;
-        this.isHost=isHost;
-        ss=new ServerSocket(port);
-    }
-
     public boolean isHost(){
         return isHost;
     }

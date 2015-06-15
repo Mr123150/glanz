@@ -127,14 +127,17 @@ public class Controller implements Initializable{
         switch(arr[0]){
             case "CLICK":
                 gc.fillOval(Double.parseDouble(arr[1]), Double.parseDouble(arr[2]), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
+                if(conn.isHost())conn.send(str);
                 break;
             case "PRESS":
                 gc.beginPath();
                 gc.moveTo(Double.parseDouble(arr[1]), Double.parseDouble(arr[2]));
+                if(conn.isHost())conn.send(str);
                 break;
             case "DRAG":
                 gc.lineTo(Double.parseDouble(arr[1]), Double.parseDouble(arr[2]));
                 gc.stroke();
+                if(conn.isHost())conn.send(str);
                 break;
             default:
                 break;
