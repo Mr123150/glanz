@@ -27,8 +27,22 @@ public class Connection{
         isHost=false;
     }
 
+    public Connection(int port, boolean isHost) throws IOException{
+        this.host=null;
+        this.port=port;
+        this.isHost=isHost;
+        ss=new ServerSocket(port);
+    }
+
     public boolean isHost(){
         return isHost;
+    }
+
+    public String getAddress() throws IOException{
+        Socket s=new Socket(host,port);
+        String addr=s.getLocalAddress().toString().substring(1);
+        s.close();
+        return addr;
     }
 
     public void send(String msg) {
@@ -45,7 +59,9 @@ public class Connection{
                 OutputStream os = s.getOutputStream();
                 out = new DataOutputStream(os);
             }
+            out.flush();
             out.writeUTF(msg);
+            out.flush();
             s.close();
         }
         catch(Exception e){
@@ -65,7 +81,9 @@ public class Connection{
             InputStream is=s.getInputStream();
             in=new DataInputStream(is);
         }
-        String str=in.readUTF();
+        String str="";
+        try{str=in.readUTF();}
+        catch (EOFException e){}
         s.close();
         return str;
     }

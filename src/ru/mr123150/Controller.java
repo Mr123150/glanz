@@ -28,6 +28,7 @@ public class Controller implements Initializable{
     DataOutputStream os = null;
 
     Connection conn=null;
+    Connection hconn=null;
 
     @Override
     public void initialize(URL url, ResourceBundle rb){
@@ -75,8 +76,10 @@ public class Controller implements Initializable{
 
     @FXML public void connect(){
         try{
-            conn=new Connection("192.168.0.100",5050);
+            conn=new Connection("192.168.0.110",5050);
+            hconn=new Connection("192.168.0.110",5051);
             conn.send("CONNECT");
+            listen();
         }
         catch (Exception e){
             e.printStackTrace();
@@ -85,33 +88,37 @@ public class Controller implements Initializable{
 
     @FXML public void host(){
         try{
-            conn=new Connection(5050);
+            hconn=new Connection(5050);
+            conn=new Connection(5051);
             System.out.println("SERVER STARTED");
-            Task task=new Task<Void>(){
-                @Override protected Void call(){
-                    while(true){
-                        try{
-                            String str=conn.receive();
-                            Platform.runLater(()->{receive(str);});
-                        }
-                        catch(Exception e){
-                            e.printStackTrace();
-                            break;
-                        }
-                    }
-                    return null;
-                }
-            };
-
-            Thread th=new Thread(task);
-            th.setDaemon(true);
-            th.start();
-
+            listen();
         }
 
         catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public void listen(){
+        Task task=new Task<Void>(){
+            @Override protected Void call(){
+                while(true){
+                    try{
+                        String str=hconn.receive();
+                        Platform.runLater(()->{receive(str);});
+                    }
+                    catch(Exception e){
+                        e.printStackTrace();
+                        break;
+                    }
+                }
+                return null;
+            }
+        };
+
+        Thread th=new Thread(task);
+        th.setDaemon(true);
+        th.start();
     }
 
     public void receive(String str){
