@@ -30,6 +30,8 @@ public class Controller implements Initializable{
     Connection conn=null;
     Connection hconn=null;
 
+    int users=0;
+
     @Override
     public void initialize(URL url, ResourceBundle rb){
         gc= canvas.getGraphicsContext2D();
@@ -44,19 +46,19 @@ public class Controller implements Initializable{
 
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED,event->{
             gc.fillOval(event.getX(), event.getY(), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
-            if(conn!=null)conn.send("CLICK;"+event.getX()+";"+event.getY());
+            if(conn!=null&&users!=0)conn.send("CLICK;"+event.getX()+";"+event.getY());
         });
 
         canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
             gc.beginPath();
             gc.moveTo(event.getX(), event.getY());
-            if(conn!=null)conn.send("PRESS;"+event.getX()+";"+event.getY());
+            if(conn!=null&&users!=0)conn.send("PRESS;"+event.getX()+";"+event.getY());
         });
 
         canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
             gc.lineTo(event.getX(), event.getY());
             gc.stroke();
-            if(conn!=null)conn.send("DRAG;"+event.getX()+";"+event.getY());
+            if(conn!=null&&users!=0)conn.send("DRAG;"+event.getX()+";"+event.getY());
         });
     }
 
@@ -90,7 +92,7 @@ public class Controller implements Initializable{
         try{
             hconn=new Connection(5050);
             conn=new Connection(5051);
-            System.out.println("SERVER STARTED");
+            System.out.println("//SERVER STARTED");
             listen();
         }
 
@@ -125,6 +127,9 @@ public class Controller implements Initializable{
         System.out.println(str);
         String arr[]=str.split(";");
         switch(arr[0]){
+            case "CONNECT":
+                ++users;
+                break;
             case "CLICK":
                 gc.fillOval(Double.parseDouble(arr[1]), Double.parseDouble(arr[2]), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
                 if(conn.isHost())conn.send(str);
