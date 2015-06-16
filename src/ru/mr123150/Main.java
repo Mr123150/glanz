@@ -1,12 +1,15 @@
 package ru.mr123150;
 
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 public class Main extends Application {
 
@@ -22,6 +25,11 @@ public class Main extends Application {
         Scene scene=new Scene(root, 300, 275);
         stage.setTitle("Canvas");
         stage.setScene(scene);
+
+        stage.setOnCloseRequest(event -> {
+            controller.disconnect();
+
+        });
 
         stage.setX(primaryScreenBounds.getMinX());
         stage.setY(primaryScreenBounds.getMinY());

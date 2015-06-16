@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="cdce8ac5-95c6-43b5-9175-3cddd4fda3f5" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ru/mr123150/Controller.java" afterPath="$PROJECT_DIR$/src/ru/mr123150/Controller.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ru/mr123150/Main.java" afterPath="$PROJECT_DIR$/src/ru/mr123150/Main.java" />
     </list>
     <ignored path="canvas-beta.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -30,8 +31,8 @@
       <file leaf-file-name="Main.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ru/mr123150/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="117" max-vertical-offset="540">
-              <caret line="20" column="0" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="615">
+              <caret line="38" column="21" selection-start-line="38" selection-start-column="21" selection-end-line="38" selection-end-column="21" />
               <folding />
             </state>
           </provider>
@@ -40,10 +41,12 @@
       <file leaf-file-name="Controller.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/ru/mr123150/Controller.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.822695" vertical-offset="1812" max-vertical-offset="2595">
-              <caret line="144" column="23" selection-start-line="144" selection-start-column="23" selection-end-line="144" selection-end-column="23" />
+            <state vertical-scroll-proportion="0.53900707" vertical-offset="2022" max-vertical-offset="2715">
+              <caret line="150" column="24" selection-start-line="150" selection-start-column="24" selection-end-line="150" selection-end-column="24" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="e#5002#5003#0" expanded="true" />
+                <element signature="e#5036#5037#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -101,6 +104,7 @@
         <option value="$PROJECT_DIR$/src/ru/mr123150/main.fxml" />
         <option value="$PROJECT_DIR$/src/ru/mr123150/conn/Connection.java" />
         <option value="$PROJECT_DIR$/src/ru/mr123150/conn/User.java" />
+        <option value="$PROJECT_DIR$/src/ru/mr123150/Main.java" />
         <option value="$PROJECT_DIR$/src/ru/mr123150/Controller.java" />
       </list>
     </option>
@@ -499,12 +503,12 @@
       <workItem from="1434137488174" duration="1577000" />
       <workItem from="1434139093106" duration="258000" />
       <workItem from="1434139403697" duration="607000" />
-      <workItem from="1434144763127" duration="48075000" />
+      <workItem from="1434144763127" duration="49049000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="50517000" />
+    <option name="totallyTimeSpent" value="51491000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1366" height="741" extended-state="6" />
@@ -579,6 +583,8 @@
           <caret line="75" column="17" selection-start-line="75" selection-start-column="17" selection-end-line="75" selection-end-column="17" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#5002#5003#0" expanded="true" />
+            <element signature="e#5036#5037#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -597,6 +603,8 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#5002#5003#0" expanded="true" />
+            <element signature="e#5036#5037#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -615,6 +623,8 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#5002#5003#0" expanded="true" />
+            <element signature="e#5036#5037#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -631,14 +641,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.33333334" vertical-offset="10074" max-vertical-offset="29340">
           <caret line="744" column="0" selection-start-line="744" selection-start-column="0" selection-end-line="744" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ru/mr123150/Main.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="12" max-vertical-offset="540">
-          <caret line="20" column="0" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -671,12 +673,22 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/ru/mr123150/Main.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="615">
+          <caret line="38" column="21" selection-start-line="38" selection-start-column="21" selection-end-line="38" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/ru/mr123150/Controller.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.822695" vertical-offset="1812" max-vertical-offset="2595">
-          <caret line="144" column="23" selection-start-line="144" selection-start-column="23" selection-end-line="144" selection-end-column="23" />
+        <state vertical-scroll-proportion="0.53900707" vertical-offset="2022" max-vertical-offset="2715">
+          <caret line="150" column="24" selection-start-line="150" selection-start-column="24" selection-end-line="150" selection-end-column="24" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#5002#5003#0" expanded="true" />
+            <element signature="e#5036#5037#0" expanded="true" />
           </folding>
         </state>
       </provider>

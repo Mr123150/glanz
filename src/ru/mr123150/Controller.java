@@ -146,6 +146,10 @@ public class Controller implements Initializable{
             case "CONNECT":
                 ++users;
                 break;
+            case "DISCONNECT":
+                if(conn.isHost())--users;
+                else conn=null;
+                break;
             case "CLICK":
                 gc.fillOval(Double.parseDouble(arr[1]), Double.parseDouble(arr[2]), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
                 if(conn.isHost())send(str);
@@ -163,5 +167,9 @@ public class Controller implements Initializable{
             default:
                 break;
         }
+    }
+
+    public void disconnect(){
+        send("DISCONNECT");
     }
 }
