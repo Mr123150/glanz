@@ -9,6 +9,7 @@ import java.net.Socket;
  */
 public class Connection{
     protected String host;
+    protected String address=null;
     protected int port;
     protected boolean isHost;
 
@@ -25,41 +26,38 @@ public class Connection{
         this.host=host;
         this.port=port;
         isHost=false;
+        Socket s=new Socket(host,port);
+        address=s.getLocalAddress().toString().substring(1);
+        s.close();
     }
 
     public boolean isHost(){
         return isHost;
     }
 
-    public String getAddress() throws IOException{
-        Socket s=new Socket(host,port);
-        String addr=s.getLocalAddress().toString().substring(1);
-        s.close();
-        return addr;
+    public String getAddress(){
+
+        return address;
     }
 
-    public void send(String msg) {
+    public void send(String msg) throws IOException{
 
         DataOutputStream out;
-        try {
-            Socket s;
-            if (isHost){
-                s = ss.accept();
-                out = new DataOutputStream(s.getOutputStream());
-            }
-            else{
-                s = new Socket(host, port);
-                OutputStream os = s.getOutputStream();
-                out = new DataOutputStream(os);
-            }
-            out.flush();
-            out.writeUTF(msg);
-            out.flush();
-            s.close();
+
+        Socket s;
+        if (isHost){
+            s = ss.accept();
+            out = new DataOutputStream(s.getOutputStream());
         }
-        catch(Exception e){
-            e.printStackTrace();
+        else{
+            s = new Socket(host, port);
+            OutputStream os = s.getOutputStream();
+            out = new DataOutputStream(os);
         }
+        out.flush();
+        out.writeUTF(msg);
+        out.flush();
+        s.close();
     }
 
     public String receive() throws IOException{

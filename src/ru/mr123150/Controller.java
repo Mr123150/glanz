@@ -8,13 +8,10 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
+
 import ru.mr123150.conn.Connection;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.OutputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -22,10 +19,6 @@ public class Controller implements Initializable{
     @FXML Canvas canvas;
     @FXML BorderPane rootPane;
     GraphicsContext gc;
-
-    ServerSocket ss = null;
-    Socket clientSocket = null;
-    DataOutputStream os = null;
 
     Connection conn=null;
     Connection hconn=null;
@@ -41,24 +34,29 @@ public class Controller implements Initializable{
         gc.lineTo(canvas.getWidth(), canvas.getHeight());
         gc.lineTo(0, canvas.getHeight());
         gc.lineTo(0, 0);
-        gc.closePath();
+        //gc.closePath();
         gc.stroke();
 
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED,event->{
             gc.fillOval(event.getX(), event.getY(), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
-            send("CLICK;"+event.getX()+";"+event.getY());
+            send("DRAW;CLICK;"+event.getX()+";"+event.getY());
         });
 
         canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
             gc.beginPath();
             gc.moveTo(event.getX(), event.getY());
-            send("PRESS;"+event.getX()+";"+event.getY());
+            send("DRAW;PRESS;"+event.getX()+";"+event.getY());
         });
 
         canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
             gc.lineTo(event.getX(), event.getY());
             gc.stroke();
-            send("DRAG;"+event.getX()+";"+event.getY());
+            send("DRAW;DRAG;"+event.getX()+";"+event.getY());
+        });
+
+        canvas.addEventHandler(MouseEvent.MOUSE_RELEASED, event -> {
+            //gc.closePath();
+            send("DRAW;RELEASE");
         });
     }
 
@@ -72,15 +70,15 @@ public class Controller implements Initializable{
         gc.lineTo(canvas.getWidth(), canvas.getHeight());
         gc.lineTo(0, canvas.getHeight());
         gc.lineTo(0, 0);
-        gc.closePath();
         gc.stroke();
+        //gc.closePath();
     }
 
     @FXML public void connect(){
         try{
             conn=new Connection("192.168.0.110",5050);
             hconn=new Connection("192.168.0.110",5051);
-            send("CONNECT");
+            send("CONNECT;REQUEST");
             listen();
         }
         catch (Exception e){
@@ -107,7 +105,7 @@ public class Controller implements Initializable{
                 while(true){
                     try{
                         String str=hconn.receive();
-                        Platform.runLater(()->{receive(str);});
+                        if (!str.equals("")) Platform.runLater(()->{receive(str);});
                     }
                     catch(Exception e){
                         e.printStackTrace();
@@ -128,7 +126,14 @@ public class Controller implements Initializable{
             Task task = new Task<Void>() {
                 @Override
                 protected Void call() {
-                    conn.send(str);
+                    try {
+                        String tstr=str;
+                        if (!conn.isHost()) tstr += (";" + conn.getAddress());
+                        conn.send(tstr);
+                    }
+                    catch(Exception e){
+                        e.printStackTrace();
+                    }
                     return null;
                 }
             };
@@ -144,25 +149,46 @@ public class Controller implements Initializable{
         String arr[]=str.split(";");
         switch(arr[0]){
             case "CONNECT":
-                ++users;
+                switch(arr[1]) {
+                    case "REQUEST":
+                        ++users;
+                        send("CONNECT;ACCEPT;" + arr[2]);
+                        System.out.println("//CONNECT;ACCEPT;" + arr[2]);
+                        send("CONNECT;ACCEPT;canvas size"); //TODO Send canvas here (WritableImage?)
+                        break;
+                    default:
+                        break;
+                }
                 break;
             case "DISCONNECT":
-                if(conn.isHost())--users;
-                else conn=null;
+                if (conn.isHost()) --users;
+                else conn = null;
                 break;
-            case "CLICK":
-                gc.fillOval(Double.parseDouble(arr[1]), Double.parseDouble(arr[2]), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
-                if(conn.isHost())send(str);
-                break;
-            case "PRESS":
-                gc.beginPath();
-                gc.moveTo(Double.parseDouble(arr[1]), Double.parseDouble(arr[2]));
-                if(conn.isHost())send(str);
-                break;
-            case "DRAG":
-                gc.lineTo(Double.parseDouble(arr[1]), Double.parseDouble(arr[2]));
-                gc.stroke();
-                if(conn.isHost())send(str);
+            case "DRAW":
+                if(conn.isHost()||!arr[arr.length-1].equals(conn.getAddress())) {
+                    switch (arr[1]) {
+                        case "CLICK":
+                            gc.fillOval(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
+                            if (conn.isHost()) send(str);
+                            break;
+                        case "PRESS":
+                            gc.beginPath();
+                            gc.moveTo(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
+                            if (conn.isHost()) send(str);
+                            break;
+                        case "DRAG":
+                            gc.lineTo(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
+                            gc.stroke();
+                            if (conn.isHost()) send(str);
+                            break;
+                        case "RELEASE":
+                            //gc.closePath();
+                            if (conn.isHost()) send(str);
+                            break;
+                        default:
+                            break;
+                    }
+                }
                 break;
             default:
                 break;

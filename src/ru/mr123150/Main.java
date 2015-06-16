@@ -28,7 +28,6 @@ public class Main extends Application {
 
         stage.setOnCloseRequest(event -> {
             controller.disconnect();
-
         });
 
         stage.setX(primaryScreenBounds.getMinX());
