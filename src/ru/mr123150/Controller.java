@@ -78,8 +78,8 @@ public class Controller implements Initializable{
         try{
             conn=new Connection("192.168.0.110",5050);
             hconn=new Connection("192.168.0.110",5051);
-            send("CONNECT;REQUEST");
             listen();
+            send("CONNECT;REQUEST");
         }
         catch (Exception e){
             e.printStackTrace();
@@ -123,24 +123,14 @@ public class Controller implements Initializable{
 
     public void send(String str){
         if(conn!=null&&(!conn.isHost()||users>0)) {
-            Task task = new Task<Void>() {
-                @Override
-                protected Void call() {
-                    try {
-                        String tstr=str;
-                        if (!conn.isHost()) tstr += (";" + conn.getAddress());
-                        conn.send(tstr);
-                    }
-                    catch(Exception e){
-                        e.printStackTrace();
-                    }
-                    return null;
-                }
-            };
+            try {
+                //if (!conn.isHost()) str += (";" + conn.getAddress());
+                conn.send(str);
+            }
+            catch(Exception e){
+                e.printStackTrace();
+            }
 
-            Thread th = new Thread(task);
-            th.setDaemon(true);
-            th.start();
         }
     }
 
@@ -149,21 +139,36 @@ public class Controller implements Initializable{
         String arr[]=str.split(";");
         switch(arr[0]){
             case "CONNECT":
-                switch(arr[1]) {
-                    case "REQUEST":
-                        ++users;
-                        send("CONNECT;ACCEPT;" + arr[2]);
-                        System.out.println("//CONNECT;ACCEPT;" + arr[2]);
-                        send("CONNECT;ACCEPT;canvas size"); //TODO Send canvas here (WritableImage?)
-                        break;
-                    default:
-                        break;
+                if(conn.isHost()||arr[arr.length-1].equals(conn.getAddress())){
+                    switch(arr[1]) {
+                        case "REQUEST":
+                            ++users;
+                            try {
+                                conn.send("CONNECT;TEST");
+                                if (true) {
+                                    conn.send("CONNECT;ACCEPT;" + arr[2]);
+                                    conn.send("SYNC;SIZE;" + canvas.getWidth() + ";" + canvas.getHeight());
+                                    conn.send("SYNC;LAYERS;1"); //Stub for multi-layers
+                                    conn.send("SYNC;DATA;0;data"); //Stub for data sync
+                                } else {
+                                    conn.send("CONNECT;REJECT;" + arr[2]);
+                                    --users;
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                        default:
+                            break;
+                    }
                 }
                 break;
             case "DISCONNECT":
-                if (conn.isHost()) --users;
-                else conn = null;
-                break;
+                if(conn.isHost()||arr[arr.length-1].equals(conn.getAddress())) {
+                    if (conn.isHost()) --users;
+                    else conn = null;
+                    break;
+                }
             case "DRAW":
                 if(conn.isHost()||!arr[arr.length-1].equals(conn.getAddress())) {
                     switch (arr[1]) {

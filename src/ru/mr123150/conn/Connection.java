@@ -53,6 +53,7 @@ public class Connection{
             s = new Socket(host, port);
             OutputStream os = s.getOutputStream();
             out = new DataOutputStream(os);
+            msg+=(";"+address);
         }
         out.flush();
         out.writeUTF(msg);
