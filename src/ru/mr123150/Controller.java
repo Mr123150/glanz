@@ -29,24 +29,28 @@ public class Controller implements Initializable{
     Connection conn=null;
     Connection hconn=null;
 
+    double width=0;
+    double height=0;
+
+    double h=0;
+    double s=0;
+    double b=0;
+
     int users=0;
 
     @Override
     public void initialize(URL url, ResourceBundle rb){
+
         hc=hcolor.getGraphicsContext2D();
         for(int i=0;i<hcolor.getWidth();++i){
             hc.setStroke(Color.hsb(i % 360, 1.0, 1.0));
             hc.strokeLine(i, 0, i, hcolor.getHeight());
         }
         cc=color.getGraphicsContext2D();
-        for(int i=0;i<color.getWidth();++i){
-            for(int j=0;j<color.getHeight();++j){
-                cc.setFill(Color.hsb(120,(double)i/color.getWidth(),1-(double)j/color.getHeight()));
-                cc.fillOval(i,j,1,1);
-            }
-        }
+        redrawColor();
 
         gc= canvas.getGraphicsContext2D();
+        resizeCanvas();
         gc.beginPath();
         gc.moveTo(0, 0);
         gc.lineTo(canvas.getWidth(),0);
@@ -78,12 +82,23 @@ public class Controller implements Initializable{
             //gc.closePath();
             send("DRAW;RELEASE");
         });
+
+        hcolor.addEventHandler(MouseEvent.MOUSE_CLICKED, event ->{
+            setHue(event.getX());
+            redrawColor();
+        });
     }
 
-    public void resizeCanvas(double width, double height){
+    public void setSize(double width, double height){
+        this.width=width;
+        this.height=height;
+        resizeCanvas();
+    }
+
+    public void resizeCanvas(){
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        canvas.setWidth(width-500);
-        canvas.setHeight(height);
+        canvas.setWidth(width-360);
+        canvas.setHeight(height-50); //TODO
         gc.beginPath();
         gc.moveTo(0, 0);
         gc.lineTo(canvas.getWidth(), 0);
@@ -92,6 +107,19 @@ public class Controller implements Initializable{
         gc.lineTo(0, 0);
         gc.stroke();
         //gc.closePath();
+    }
+
+    public void setHue(double h){
+        this.h=h;
+    }
+
+    public void redrawColor(){
+        for(int i=0;i<color.getWidth();++i){
+            for(int j=0;j<color.getHeight();++j){
+                cc.setFill(Color.hsb(h,(double)i/color.getWidth(),1-(double)j/color.getHeight()));
+                cc.fillOval(i,j,1,1);
+            }
+        }
     }
 
     @FXML public void connect(){
