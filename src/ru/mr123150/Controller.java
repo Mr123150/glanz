@@ -8,6 +8,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import ru.mr123150.conn.Connection;
@@ -17,8 +18,13 @@ import java.util.ResourceBundle;
 
 public class Controller implements Initializable{
     @FXML Canvas canvas;
+    @FXML Canvas hcolor;
+    @FXML Canvas color;
     @FXML BorderPane rootPane;
+    @FXML VBox rightBox;
     GraphicsContext gc;
+    GraphicsContext hc;
+    GraphicsContext cc;
 
     Connection conn=null;
     Connection hconn=null;
@@ -27,6 +33,19 @@ public class Controller implements Initializable{
 
     @Override
     public void initialize(URL url, ResourceBundle rb){
+        hc=hcolor.getGraphicsContext2D();
+        for(int i=0;i<hcolor.getWidth();++i){
+            hc.setStroke(Color.hsb(i % 360, 1.0, 1.0));
+            hc.strokeLine(i, 0, i, hcolor.getHeight());
+        }
+        cc=color.getGraphicsContext2D();
+        for(int i=0;i<color.getWidth();++i){
+            for(int j=0;j<color.getHeight();++j){
+                cc.setFill(Color.hsb(120,(double)i/color.getWidth(),1-(double)j/color.getHeight()));
+                cc.fillOval(i,j,1,1);
+            }
+        }
+
         gc= canvas.getGraphicsContext2D();
         gc.beginPath();
         gc.moveTo(0, 0);
@@ -36,6 +55,7 @@ public class Controller implements Initializable{
         gc.lineTo(0, 0);
         //gc.closePath();
         gc.stroke();
+
 
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED,event->{
             gc.fillOval(event.getX(), event.getY(), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
@@ -62,7 +82,7 @@ public class Controller implements Initializable{
 
     public void resizeCanvas(double width, double height){
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        canvas.setWidth(width);
+        canvas.setWidth(width-500);
         canvas.setHeight(height);
         gc.beginPath();
         gc.moveTo(0, 0);
