@@ -32,9 +32,7 @@ public class Controller implements Initializable{
     double width=0;
     double height=0;
 
-    double h=0;
-    double s=0;
-    double b=0;
+    double h,s,b;
 
     int users=0;
 
@@ -44,7 +42,7 @@ public class Controller implements Initializable{
         cc=color.getGraphicsContext2D();
 
         setHue(0);
-        redrawColor();
+        setColor(0,0);
 
         gc= canvas.getGraphicsContext2D();
         gc.beginPath();
@@ -81,12 +79,18 @@ public class Controller implements Initializable{
 
         hcolor.addEventHandler(MouseEvent.MOUSE_PRESSED, event ->{
             setHue(event.getX());
-            redrawColor();
         });
 
         hcolor.addEventHandler(MouseEvent.MOUSE_DRAGGED, event ->{
             setHue(event.getX());
-            redrawColor();
+        });
+
+        color.addEventHandler(MouseEvent.MOUSE_PRESSED, event ->{
+            setColor(event.getX(),event.getY());
+        });
+
+        color.addEventHandler(MouseEvent.MOUSE_DRAGGED, event ->{
+            setColor(event.getX(),event.getY());
         });
     }
 
@@ -120,15 +124,25 @@ public class Controller implements Initializable{
         }
         hc.setStroke(Color.BLACK);
         hc.strokeOval(h-hcolor.getHeight()/2,0,hcolor.getHeight(),hcolor.getHeight());
+        redrawColor();
+    }
+
+    public void setColor(double s, double b){
+        this.s=s/color.getWidth();
+        this.b=1-b/color.getHeight();
+        redrawColor();
     }
 
     public void redrawColor(){
+        cc.clearRect(0,0,color.getWidth(),color.getHeight());
         for(int i=0;i<color.getWidth();++i){
             for(int j=0;j<color.getHeight();++j){
                 cc.setFill(Color.hsb(h,(double)i/color.getWidth(),1-(double)j/color.getHeight()));
                 cc.fillOval(i,j,1,1);
             }
         }
+        cc.setStroke(Color.BLACK);
+        cc.strokeOval(s*color.getWidth()-hcolor.getHeight()/2,(1-b)*color.getHeight()-hcolor.getHeight()/2,hcolor.getHeight(),hcolor.getHeight());
     }
 
     @FXML public void connect(){
