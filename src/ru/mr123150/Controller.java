@@ -42,7 +42,7 @@ public class Controller implements Initializable{
         cc=color.getGraphicsContext2D();
 
         setHue(0);
-        setColor(0,0);
+        setColor(0, 0);
 
         gc= canvas.getGraphicsContext2D();
         gc.beginPath();
@@ -86,11 +86,11 @@ public class Controller implements Initializable{
         });
 
         color.addEventHandler(MouseEvent.MOUSE_PRESSED, event ->{
-            setColor(event.getX(),event.getY());
+            setColor(event.getX(), event.getY());
         });
 
         color.addEventHandler(MouseEvent.MOUSE_DRAGGED, event ->{
-            setColor(event.getX(),event.getY());
+            setColor(event.getX(), event.getY());
         });
     }
 
@@ -102,8 +102,7 @@ public class Controller implements Initializable{
 
     public void resizeCanvas(){
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        System.out.println(rightBox.getWidth());
-        canvas.setWidth(width-360);
+        canvas.setWidth(width-rightBox.getWidth());
         canvas.setHeight(height-50); //TODO
         gc.beginPath();
         gc.moveTo(0, 0);
