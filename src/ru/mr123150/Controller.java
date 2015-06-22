@@ -40,17 +40,13 @@ public class Controller implements Initializable{
 
     @Override
     public void initialize(URL url, ResourceBundle rb){
-
         hc=hcolor.getGraphicsContext2D();
-        for(int i=0;i<hcolor.getWidth();++i){
-            hc.setStroke(Color.hsb(i % 360, 1.0, 1.0));
-            hc.strokeLine(i, 0, i, hcolor.getHeight());
-        }
         cc=color.getGraphicsContext2D();
+
+        setHue(0);
         redrawColor();
 
         gc= canvas.getGraphicsContext2D();
-        resizeCanvas();
         gc.beginPath();
         gc.moveTo(0, 0);
         gc.lineTo(canvas.getWidth(),0);
@@ -83,7 +79,12 @@ public class Controller implements Initializable{
             send("DRAW;RELEASE");
         });
 
-        hcolor.addEventHandler(MouseEvent.MOUSE_CLICKED, event ->{
+        hcolor.addEventHandler(MouseEvent.MOUSE_PRESSED, event ->{
+            setHue(event.getX());
+            redrawColor();
+        });
+
+        hcolor.addEventHandler(MouseEvent.MOUSE_DRAGGED, event ->{
             setHue(event.getX());
             redrawColor();
         });
@@ -97,6 +98,7 @@ public class Controller implements Initializable{
 
     public void resizeCanvas(){
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        System.out.println(rightBox.getWidth());
         canvas.setWidth(width-360);
         canvas.setHeight(height-50); //TODO
         gc.beginPath();
@@ -110,7 +112,14 @@ public class Controller implements Initializable{
     }
 
     public void setHue(double h){
-        this.h=h;
+        hc.clearRect(0,0,hcolor.getWidth(),hcolor.getHeight());
+        this.h=h/hcolor.getWidth()*360;
+        for(int i=0;i<hcolor.getWidth();++i){
+            hc.setStroke(Color.hsb((double)i/hcolor.getWidth()*360, 1.0, 1.0, 1.0));
+            hc.strokeLine(i, 0, i, hcolor.getHeight());
+        }
+        hc.setStroke(Color.BLACK);
+        hc.strokeOval(h-hcolor.getHeight()/2,0,hcolor.getHeight(),hcolor.getHeight());
     }
 
     public void redrawColor(){

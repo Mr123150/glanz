@@ -14,8 +14,8 @@
     </center>
     <right>
         <VBox fx:id="rightBox">
-            <Canvas fx:id="hcolor" width="360.0" height="20.0" />
-            <Canvas fx:id="color" width="360.0" height="360.0" />
+            <Canvas fx:id="hcolor" width="250.0" height="15.0" />
+            <Canvas fx:id="color" width="250.0" height="250.0" />
         </VBox>
     </right>
 </BorderPane>
