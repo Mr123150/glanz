@@ -8,6 +8,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import ru.mr123150.conn.Connection;
@@ -17,16 +18,32 @@ import java.util.ResourceBundle;
 
 public class Controller implements Initializable{
     @FXML Canvas canvas;
+    @FXML Canvas hcolor;
+    @FXML Canvas color;
     @FXML BorderPane rootPane;
+    @FXML VBox rightBox;
     GraphicsContext gc;
+    GraphicsContext hc;
+    GraphicsContext cc;
 
     Connection conn=null;
     Connection hconn=null;
+
+    double width=0;
+    double height=0;
+
+    double h,s,b;
 
     int users=0;
 
     @Override
     public void initialize(URL url, ResourceBundle rb){
+        hc=hcolor.getGraphicsContext2D();
+        cc=color.getGraphicsContext2D();
+
+        setHue(0);
+        setColor(0, 0);
+
         gc= canvas.getGraphicsContext2D();
         gc.beginPath();
         gc.moveTo(0, 0);
@@ -36,6 +53,7 @@ public class Controller implements Initializable{
         gc.lineTo(0, 0);
         //gc.closePath();
         gc.stroke();
+
 
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED,event->{
             gc.fillOval(event.getX(), event.getY(), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
@@ -58,12 +76,34 @@ public class Controller implements Initializable{
             //gc.closePath();
             send("DRAW;RELEASE");
         });
+
+        hcolor.addEventHandler(MouseEvent.MOUSE_PRESSED, event ->{
+            setHue(event.getX());
+        });
+
+        hcolor.addEventHandler(MouseEvent.MOUSE_DRAGGED, event ->{
+            setHue(event.getX());
+        });
+
+        color.addEventHandler(MouseEvent.MOUSE_PRESSED, event ->{
+            setColor(event.getX(), event.getY());
+        });
+
+        color.addEventHandler(MouseEvent.MOUSE_DRAGGED, event ->{
+            setColor(event.getX(), event.getY());
+        });
     }
 
-    public void resizeCanvas(double width, double height){
+    public void setSize(double width, double height){
+        this.width=width;
+        this.height=height;
+        resizeCanvas();
+    }
+
+    public void resizeCanvas(){
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        canvas.setWidth(width);
-        canvas.setHeight(height);
+        canvas.setWidth(width-rightBox.getWidth());
+        canvas.setHeight(height-50); //TODO
         gc.beginPath();
         gc.moveTo(0, 0);
         gc.lineTo(canvas.getWidth(), 0);
@@ -72,6 +112,36 @@ public class Controller implements Initializable{
         gc.lineTo(0, 0);
         gc.stroke();
         //gc.closePath();
+    }
+
+    public void setHue(double h){
+        hc.clearRect(0,0,hcolor.getWidth(),hcolor.getHeight());
+        this.h=h/hcolor.getWidth()*360;
+        for(int i=0;i<hcolor.getWidth();++i){
+            hc.setStroke(Color.hsb((double)i/hcolor.getWidth()*360, 1.0, 1.0, 1.0));
+            hc.strokeLine(i, 0, i, hcolor.getHeight());
+        }
+        hc.setStroke(Color.BLACK);
+        hc.strokeOval(h-hcolor.getHeight()/2,0,hcolor.getHeight(),hcolor.getHeight());
+        redrawColor();
+    }
+
+    public void setColor(double s, double b){
+        this.s=s/color.getWidth();
+        this.b=1-b/color.getHeight();
+        redrawColor();
+    }
+
+    public void redrawColor(){
+        cc.clearRect(0,0,color.getWidth(),color.getHeight());
+        for(int i=0;i<color.getWidth();++i){
+            for(int j=0;j<color.getHeight();++j){
+                cc.setFill(Color.hsb(h,(double)i/color.getWidth(),1-(double)j/color.getHeight()));
+                cc.fillOval(i,j,1,1);
+            }
+        }
+        cc.setStroke(Color.BLACK);
+        cc.strokeOval(s*color.getWidth()-hcolor.getHeight()/2,(1-b)*color.getHeight()-hcolor.getHeight()/2,hcolor.getHeight(),hcolor.getHeight());
     }
 
     @FXML public void connect(){

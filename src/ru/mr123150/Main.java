@@ -20,7 +20,6 @@ public class Main extends Application {
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
 
         Controller controller=loader.getController();
-        controller.resizeCanvas(primaryScreenBounds.getWidth(),primaryScreenBounds.getHeight()-50);
 
         Scene scene=new Scene(root, 300, 275);
         stage.setTitle("Canvas");
@@ -36,6 +35,8 @@ public class Main extends Application {
         stage.setHeight(primaryScreenBounds.getHeight());
 
         stage.show();
+
+        controller.setSize(primaryScreenBounds.getWidth(),primaryScreenBounds.getHeight());
     }
 
 
