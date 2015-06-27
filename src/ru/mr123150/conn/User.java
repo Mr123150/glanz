@@ -7,7 +7,6 @@ import javafx.scene.paint.Color;
  */
 public class User {
     protected int id;
-    protected String address;
 
     protected double h;
     protected double s;
@@ -17,18 +16,11 @@ public class User {
     public float y;
 
     public User(){
-        this.address=null;
         this.id=0;
     }
 
-    public User(String address){
-        this.id=-1;
-        this.address=address;
-    }
-
-    public User(int id, String address){
+    public User(int id){
         this.id=id;
-        this.address=address;
     }
 
     public int id(){

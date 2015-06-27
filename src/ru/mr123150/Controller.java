@@ -43,7 +43,7 @@ public class Controller implements Initializable{
         hc=hcolor.getGraphicsContext2D();
         cc=color.getGraphicsContext2D();
 
-        setHue(0);
+        setHue(180);
         setColor(0, 0);
 
         gc= canvas.getGraphicsContext2D();
@@ -58,6 +58,8 @@ public class Controller implements Initializable{
 
 
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED,event->{
+            if(conn!=null) gc.setStroke(conn.users.get(0).color());
+            else gc.setStroke(Color.hsb(h,s,b));
             gc.fillOval(event.getX(), event.getY(), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
             send("DRAW;CLICK;"+event.getX()+";"+event.getY());
         });
@@ -69,6 +71,8 @@ public class Controller implements Initializable{
         });
 
         canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
+            if(conn!=null) gc.setStroke(conn.users.get(0).color());
+            else gc.setStroke(Color.hsb(h,s,b));
             gc.lineTo(event.getX(), event.getY());
             gc.stroke();
             send("DRAW;DRAG;"+event.getX()+";"+event.getY());
@@ -80,19 +84,19 @@ public class Controller implements Initializable{
         });
 
         hcolor.addEventHandler(MouseEvent.MOUSE_PRESSED, event ->{
-            setHue(event.getX());
+            setHue(event.getX()/hcolor.getWidth()*360);
         });
 
         hcolor.addEventHandler(MouseEvent.MOUSE_DRAGGED, event ->{
-            setHue(event.getX());
+            setHue(event.getX()/hcolor.getWidth()*360);
         });
 
         color.addEventHandler(MouseEvent.MOUSE_PRESSED, event ->{
-            setColor(event.getX(), event.getY());
+            setColor(event.getX()/color.getWidth(), 1-event.getY()/color.getHeight());
         });
 
         color.addEventHandler(MouseEvent.MOUSE_DRAGGED, event ->{
-            setColor(event.getX(), event.getY());
+            setColor(event.getX()/color.getWidth(), 1-event.getY()/color.getHeight());
         });
     }
 
@@ -112,19 +116,21 @@ public class Controller implements Initializable{
 
     public void setHue(double h){
         hc.clearRect(0,0,hcolor.getWidth(),hcolor.getHeight());
-        this.h=h/hcolor.getWidth()*360;
+        if(conn!=null) conn.users.get(0).setColor(h,s,b);
+        this.h=h;
         for(int i=0;i<hcolor.getWidth();++i){
             hc.setStroke(Color.hsb((double)i/hcolor.getWidth()*360, 1.0, 1.0, 1.0));
             hc.strokeLine(i, 0, i, hcolor.getHeight());
         }
         hc.setStroke(Color.BLACK);
-        hc.strokeOval(h-hcolor.getHeight()/2,0,hcolor.getHeight(),hcolor.getHeight());
+        hc.strokeOval(h/360*hcolor.getWidth()-hcolor.getHeight()/2,0,hcolor.getHeight(),hcolor.getHeight());
         redrawColor();
     }
 
     public void setColor(double s, double b){
-        this.s=s/color.getWidth();
-        this.b=1-b/color.getHeight();
+        if(conn!=null) conn.users.get(0).setColor(h,s,b);
+        this.s=s;
+        this.b=b;
         redrawColor();
     }
 
@@ -158,6 +164,8 @@ public class Controller implements Initializable{
             conn=new Connection(5051);
             System.out.println("//SERVER STARTED");
             listen();
+            conn.users.insertElementAt(new User(),0);
+            conn.users.get(0).setColor(h,s,b);
         }
 
         catch (Exception e){
@@ -207,8 +215,8 @@ public class Controller implements Initializable{
                 if(conn.isHost()||arr[arr.length-1].equals(conn.getAddress())){
                     switch(arr[1]) {
                         case "REQUEST":
-                            int id=conn.users.size();
-                            conn.users.add(new User(id,arr[2]));
+                            int id=conn.users.lastElement().id()+1;
+                            conn.users.add(new User(id));
                             ++users;
                             try {
                                 conn.send("CONNECT;TEST");
@@ -225,6 +233,9 @@ public class Controller implements Initializable{
                                 e.printStackTrace();
                             }
                             break;
+                        case "ACCEPT":
+                            conn.users.insertElementAt(new User(Integer.parseInt(arr[2])),0);
+                            conn.users.get(0).setColor(h,s,b);
                         default:
                             break;
                     }
