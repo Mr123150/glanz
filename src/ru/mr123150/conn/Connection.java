@@ -3,6 +3,7 @@ package ru.mr123150.conn;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Vector;
 
 /**
  * Created by victorsnesarevsky on 13.06.15.
@@ -13,13 +14,17 @@ public class Connection{
     protected int port;
     protected boolean isHost;
 
-    ServerSocket ss = null;
+    protected ServerSocket ss = null;
+
+    public Vector<User> users=new Vector<>();
 
     public Connection(int port) throws IOException{
         this.host=null;
         this.port=port;
         isHost=true;
         ss=new ServerSocket(port);
+
+        users.add(new User());
     }
 
     public Connection(String host, int port) throws IOException{

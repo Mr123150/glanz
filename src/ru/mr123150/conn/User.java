@@ -6,21 +6,28 @@ import javafx.scene.paint.Color;
  * Created by victorsnesarevsky on 13.06.15.
  */
 public class User {
-    protected int id=0;
+    protected int id;
     protected String address;
-
-    protected float x;
-    protected float y;
 
     protected double h;
     protected double s;
     protected double b;
 
+    public float x;
+    public float y;
+
     public User(){
         this.address=null;
+        this.id=0;
     }
 
     public User(String address){
+        this.id=-1;
+        this.address=address;
+    }
+
+    public User(int id, String address){
+        this.id=id;
         this.address=address;
     }
 

@@ -8,10 +8,12 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import ru.mr123150.conn.Connection;
+import ru.mr123150.conn.User;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -21,16 +23,16 @@ public class Controller implements Initializable{
     @FXML Canvas hcolor;
     @FXML Canvas color;
     @FXML BorderPane rootPane;
+    @FXML HBox topBox;
+    @FXML VBox leftBox;
     @FXML VBox rightBox;
+    @FXML HBox bottomBox;
     GraphicsContext gc;
     GraphicsContext hc;
     GraphicsContext cc;
 
     Connection conn=null;
     Connection hconn=null;
-
-    double width=0;
-    double height=0;
 
     double h,s,b;
 
@@ -94,16 +96,10 @@ public class Controller implements Initializable{
         });
     }
 
-    public void setSize(double width, double height){
-        this.width=width;
-        this.height=height;
-        resizeCanvas();
-    }
-
-    public void resizeCanvas(){
+    public void resizeCanvas(double width, double height){
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        canvas.setWidth(width-rightBox.getWidth());
-        canvas.setHeight(height-50); //TODO
+        canvas.setWidth(width-leftBox.getWidth()-rightBox.getWidth());
+        canvas.setHeight(height-topBox.getHeight()-bottomBox.getHeight());
         gc.beginPath();
         gc.moveTo(0, 0);
         gc.lineTo(canvas.getWidth(), 0);
@@ -192,9 +188,8 @@ public class Controller implements Initializable{
     }
 
     public void send(String str){
-        if(conn!=null&&(!conn.isHost()||users>0)) {
+        if(conn!=null&&(!conn.isHost()||conn.users.size()>0)) {
             try {
-                //if (!conn.isHost()) str += (";" + conn.getAddress());
                 conn.send(str);
             }
             catch(Exception e){
@@ -212,17 +207,19 @@ public class Controller implements Initializable{
                 if(conn.isHost()||arr[arr.length-1].equals(conn.getAddress())){
                     switch(arr[1]) {
                         case "REQUEST":
+                            int id=conn.users.size();
+                            conn.users.add(new User(id,arr[2]));
                             ++users;
                             try {
                                 conn.send("CONNECT;TEST");
                                 if (true) {
-                                    conn.send("CONNECT;ACCEPT;" + arr[2]);
-                                    conn.send("SYNC;SIZE;" + canvas.getWidth() + ";" + canvas.getHeight());
-                                    conn.send("SYNC;LAYERS;1"); //Stub for multi-layers
-                                    conn.send("SYNC;DATA;0;data"); //Stub for data sync
+                                    conn.send("CONNECT;ACCEPT;" + id + ";" + arr[2]);
+                                    conn.send("SYNC;SIZE;" + canvas.getWidth() + ";" + canvas.getHeight() + ";" + arr[2]);
+                                    conn.send("SYNC;LAYERS;1" + ";" + arr[2]); //Stub for multi-layers
+                                    conn.send("SYNC;DATA;0;data" + ";" + arr[2]); //Stub for data sync
                                 } else {
                                     conn.send("CONNECT;REJECT;" + arr[2]);
-                                    --users;
+                                    conn.users.remove(id);
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();

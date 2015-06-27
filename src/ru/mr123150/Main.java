@@ -36,7 +36,7 @@ public class Main extends Application {
 
         stage.show();
 
-        controller.setSize(primaryScreenBounds.getWidth(),primaryScreenBounds.getHeight());
+        controller.resizeCanvas(primaryScreenBounds.getWidth(),primaryScreenBounds.getHeight());
     }
 
 
