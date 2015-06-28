@@ -256,9 +256,14 @@ public class Controller implements Initializable{
                 }
                 break;
             case "DISCONNECT":
-                if(conn.isHost()||arr[arr.length-1].equals(conn.getAddress())) {
-                    if (conn.isHost()) --users;
-                    else conn = null;
+                if(conn.isHost()||Integer.parseInt(arr[1])==id||Integer.parseInt(arr[1])==0) {
+                    if (conn.isHost()) {
+                        conn.users.remove(conn.getUserById(id));
+                    }
+                    else {
+                        conn=null;
+                        hconn=null;
+                    }
                     break;
                 }
             case "DRAW":
