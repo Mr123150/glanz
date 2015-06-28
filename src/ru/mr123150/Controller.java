@@ -306,9 +306,13 @@ public class Controller implements Initializable{
                         switch (arr[1]) {
                             case "COLOR":
                                 conn.users.get(user_id).setColor(Double.parseDouble(arr[2]),Double.parseDouble(arr[3]),Double.parseDouble(arr[4]));
+                                break;
+                            default:
+                                break;
                         }
                     }
                 }
+                break;
             default:
                 break;
         }
