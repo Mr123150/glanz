@@ -43,7 +43,7 @@ public class Controller implements Initializable{
         hc=hcolor.getGraphicsContext2D();
         cc=color.getGraphicsContext2D();
 
-        setHue(180);
+        setHue(0);
         setColor(0, 0);
 
         gc= canvas.getGraphicsContext2D();
@@ -116,7 +116,6 @@ public class Controller implements Initializable{
 
     public void setHue(double h){
         hc.clearRect(0,0,hcolor.getWidth(),hcolor.getHeight());
-        if(conn!=null) conn.users.get(0).setColor(h,s,b);
         this.h=h;
         for(int i=0;i<hcolor.getWidth();++i){
             hc.setStroke(Color.hsb((double)i/hcolor.getWidth()*360, 1.0, 1.0, 1.0));
@@ -128,13 +127,16 @@ public class Controller implements Initializable{
     }
 
     public void setColor(double s, double b){
-        if(conn!=null) conn.users.get(0).setColor(h,s,b);
         this.s=s;
         this.b=b;
         redrawColor();
     }
 
     public void redrawColor(){
+        if(conn!=null) {
+            conn.users.get(0).setColor(h, s, b);
+            send("CHANGE;COLOR;"+h+";"+s+";"+b);
+        }
         cc.clearRect(0,0,color.getWidth(),color.getHeight());
         for(int i=0;i<color.getWidth();++i){
             for(int j=0;j<color.getHeight();++j){
@@ -151,7 +153,7 @@ public class Controller implements Initializable{
             conn=new Connection("192.168.0.110",5050);
             hconn=new Connection("192.168.0.110",5051);
             listen();
-            send("CONNECT;REQUEST");
+            send("CONNECT;REQUEST;"+conn.getAddress());
         }
         catch (Exception e){
             e.printStackTrace();
@@ -164,7 +166,7 @@ public class Controller implements Initializable{
             conn=new Connection(5051);
             System.out.println("//SERVER STARTED");
             listen();
-            conn.users.insertElementAt(new User(),0);
+            conn.users.insertElementAt(new User(), 0);
             conn.users.get(0).setColor(h,s,b);
         }
 
@@ -198,7 +200,19 @@ public class Controller implements Initializable{
     public void send(String str){
         if(conn!=null&&(!conn.isHost()||conn.users.size()>0)) {
             try {
-                conn.send(str);
+                conn.send(str,true);
+            }
+            catch(Exception e){
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+    public void send(String str, boolean signature){
+        if(conn!=null&&(!conn.isHost()||conn.users.size()>0)) {
+            try {
+                conn.send(str,signature);
             }
             catch(Exception e){
                 e.printStackTrace();
@@ -210,24 +224,23 @@ public class Controller implements Initializable{
     public void receive(String str){
         System.out.println(str);
         String arr[]=str.split(";");
+        int id=Integer.parseInt(arr[arr.length-1]);
         switch(arr[0]){
             case "CONNECT":
-                if(conn.isHost()||arr[arr.length-1].equals(conn.getAddress())){
+                if(conn.isHost()||arr[arr.length-2].equals(conn.getAddress())){
                     switch(arr[1]) {
                         case "REQUEST":
-                            int id=conn.users.lastElement().id()+1;
-                            conn.users.add(new User(id));
-                            ++users;
+                            int new_id=conn.users.lastElement().id()+1;
                             try {
-                                conn.send("CONNECT;TEST");
+                                conn.send("CONNECT;TEST", true);
                                 if (true) {
-                                    conn.send("CONNECT;ACCEPT;" + id + ";" + arr[2]);
-                                    conn.send("SYNC;SIZE;" + canvas.getWidth() + ";" + canvas.getHeight() + ";" + arr[2]);
-                                    conn.send("SYNC;LAYERS;1" + ";" + arr[2]); //Stub for multi-layers
-                                    conn.send("SYNC;DATA;0;data" + ";" + arr[2]); //Stub for data sync
+                                    conn.users.add(new User(new_id));
+                                    send("CONNECT;ACCEPT;" + new_id + ";" + arr[2]);
+                                    send("SYNC;SIZE;" + canvas.getWidth() + ";" + canvas.getHeight() + ";" + arr[2]);
+                                    send("SYNC;LAYERS;1" + ";" + arr[2]); //Stub for multi-layers
+                                    send("SYNC;DATA;0;data" + ";" + arr[2]); //Stub for data sync
                                 } else {
-                                    conn.send("CONNECT;REJECT;" + arr[2]);
-                                    conn.users.remove(id);
+                                    conn.send("CONNECT;REJECT;" + arr[2], true);
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -235,7 +248,8 @@ public class Controller implements Initializable{
                             break;
                         case "ACCEPT":
                             conn.users.insertElementAt(new User(Integer.parseInt(arr[2])),0);
-                            conn.users.get(0).setColor(h,s,b);
+                            conn.users.insertElementAt(new User(), 1);
+                            conn.users.get(0).setColor(h, s, b);
                         default:
                             break;
                     }
@@ -248,31 +262,48 @@ public class Controller implements Initializable{
                     break;
                 }
             case "DRAW":
-                if(conn.isHost()||!arr[arr.length-1].equals(conn.getAddress())) {
+                if(conn.isHost()||id!=conn.users.get(0).id()) {
+                    int user_id=conn.getUserById(id);
+                    if(user_id!=-1){
+                        gc.setStroke(conn.users.get(user_id).color());
+                    }
+                    else{
+                        gc.setStroke(Color.BLACK);
+                    }
                     switch (arr[1]) {
                         case "CLICK":
                             gc.fillOval(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
-                            if (conn.isHost()) send(str);
+                            if (conn.isHost()) send(str,false);
                             break;
                         case "PRESS":
                             gc.beginPath();
                             gc.moveTo(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
-                            if (conn.isHost()) send(str);
+                            if (conn.isHost()) send(str,false);
                             break;
                         case "DRAG":
                             gc.lineTo(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
                             gc.stroke();
-                            if (conn.isHost()) send(str);
+                            if (conn.isHost()) send(str,false);
                             break;
                         case "RELEASE":
                             //gc.closePath();
-                            if (conn.isHost()) send(str);
+                            if (conn.isHost()) send(str,false);
                             break;
                         default:
                             break;
                     }
                 }
                 break;
+            case "CHANGE":
+                if(conn.isHost()||id!=conn.users.get(0).id()) {
+                    int user_id=conn.getUserById(id);
+                    if(user_id!=-1) {
+                        switch (arr[1]) {
+                            case "COLOR":
+                                conn.users.get(user_id).setColor(Double.parseDouble(arr[2]),Double.parseDouble(arr[3]),Double.parseDouble(arr[4]));
+                        }
+                    }
+                }
             default:
                 break;
         }
