@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <BorderPane fx:controller="ru.mr123150.Controller" fx:id="rootPane" xmlns:fx="http://javafx.com/fxml">
     <top>
-        <HBox>
+        <HBox fx:id="topBox">
             <Button fx:id="connectBtn" onAction="#connect" text="Connect"/>
             <Button fx:id="hostBtn" onAction="#host" text="Host" />
         </HBox>
@@ -12,10 +12,20 @@
     <center>
         <Canvas fx:id="canvas" width="500.0" height="500.0"/>
     </center>
+    <left>
+        <VBox fx:id="leftBox">
+
+        </VBox>
+    </left>
     <right>
         <VBox fx:id="rightBox">
             <Canvas fx:id="hcolor" width="250.0" height="15.0" />
             <Canvas fx:id="color" width="250.0" height="250.0" />
         </VBox>
     </right>
+    <bottom>
+        <HBox fx:id="bottomBox">
+
+        </HBox>
+    </bottom>
 </BorderPane>
