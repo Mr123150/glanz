@@ -1,0 +1,4 @@
+<?import javafx.scene.control.Label?>
+<fx:root type="javafx.scene.layout.HBox" xmlns:fx="http://javafx.com/fxml" prefHeight="30">
+    <Label fx:id="idLabel"/>
+</fx:root>

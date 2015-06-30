@@ -86,11 +86,11 @@ public class Connection{
     }
 
     public int getUserById(int id){
-        int i=-1;
+        int i=0;
         for(User user:users){
-            ++i;
             if(user.id()==id) return i;
+            ++i;
         }
-        return i;
+        return -1;
     }
 }

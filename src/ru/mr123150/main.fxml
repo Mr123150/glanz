@@ -2,6 +2,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.canvas.*?>
 <?import javafx.scene.layout.*?>
+<?import ru.mr123150.gui.ScrollList?>
+<?import javafx.scene.text.Text?>
 <BorderPane fx:controller="ru.mr123150.Controller" fx:id="rootPane" xmlns:fx="http://javafx.com/fxml">
     <top>
         <HBox fx:id="topBox">
@@ -21,6 +23,8 @@
         <VBox fx:id="rightBox">
             <Canvas fx:id="hcolor" width="250.0" height="15.0" />
             <Canvas fx:id="color" width="250.0" height="250.0" />
+            <Label text="Users" />
+            <ScrollList fx:id="userScroll" prefWidth="250" prefHeight="200"/>
         </VBox>
     </right>
     <bottom>
