@@ -21,19 +21,19 @@ public class Connection{
     public Vector<User> users=new Vector<>();
 
     public Connection(int port) throws IOException{
+        this.serverAddress=InetAddress.getByName("255.255.255.255");
         this.port=port;
         isServer=true;
         socket=new DatagramSocket(port);
-
         users.add(new User());
     }
 
-    public Connection(String serverAddress, int port) throws IOException{
-        this.serverAddress=InetAddress.getByName(serverAddress);
+    public Connection(String address, int port) throws IOException{
+        this.serverAddress=InetAddress.getByName(address);
         this.port=port;
         isServer=false;
         socket=new DatagramSocket();
-        address=InetAddress.getLocalHost();
+        this.address=InetAddress.getLocalHost();
     }
 
     public boolean isServer(){
@@ -44,15 +44,11 @@ public class Connection{
         return address.getHostAddress();
     }
 
-    public void send(String msg,InetAddress target,boolean signature) throws IOException{
+    public void send(String msg,boolean signature) throws IOException{
         DatagramPacket packet;
         if(signature) msg+=(";"+(users.isEmpty()?-1:users.get(0).id()));
-        if (isServer){
-            packet= new DatagramPacket(msg.getBytes(),msg.length(),target,port);
-        }
-        else{
-            packet=new DatagramPacket(msg.getBytes(),msg.length(),serverAddress,port);
-        }
+        packet=new DatagramPacket(msg.getBytes(),msg.length(),serverAddress,port);
+
         socket.send(packet);
     }
 

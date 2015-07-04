@@ -59,7 +59,7 @@ public class Controller implements Initializable{
 
 
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED,event->{
-            if(conn!=null) gc.setStroke(conn.users.get(0).color());
+            if(conn!=null&&!conn.users.isEmpty()) gc.setStroke(conn.users.get(0).color());
             else gc.setStroke(Color.hsb(h,s,b));
             gc.fillOval(event.getX(), event.getY(), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
             send("DRAW;CLICK;"+event.getX()+";"+event.getY());
@@ -72,7 +72,7 @@ public class Controller implements Initializable{
         });
 
         canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
-            if(conn!=null) gc.setStroke(conn.users.get(0).color());
+            if(conn!=null&&!conn.users.isEmpty()) gc.setStroke(conn.users.get(0).color());
             else gc.setStroke(Color.hsb(h,s,b));
             gc.lineTo(event.getX(), event.getY());
             gc.stroke();
@@ -201,7 +201,7 @@ public class Controller implements Initializable{
     public void send(String str){
         if(conn!=null&&(!conn.isServer()||conn.users.size()>0)) {
             try {
-                conn.send(str,InetAddress.getLocalHost(),true);
+                conn.send(str,true);
             }
             catch(Exception e){
                 e.printStackTrace();
@@ -213,19 +213,7 @@ public class Controller implements Initializable{
     public void send(String str, boolean signature){
         if(conn!=null&&(!conn.isServer()||conn.users.size()>0)) {
             try {
-                conn.send(str,InetAddress.getLocalHost(),signature); //TODO rewrite to multicast
-            }
-            catch(Exception e){
-                e.printStackTrace();
-            }
-
-        }
-    }
-
-    public void send(String str, String target, boolean signature){
-        if(conn!=null&&(!conn.isServer()||conn.users.size()>0)) {
-            try {
-                conn.send(str,InetAddress.getByName(target),signature);
+                conn.send(str,signature);
             }
             catch(Exception e){
                 e.printStackTrace();
@@ -251,15 +239,15 @@ public class Controller implements Initializable{
                         case "REQUEST":
                             int new_id=conn.users.lastElement().id()+1;
                             try {
-                                conn.send("CONNECT;TEST", InetAddress.getByName(arr[2]), true);
+                                conn.send("CONNECT;TEST", true);
                                 if (true) {
                                     conn.users.add(new User(new_id));
-                                    send("CONNECT;ACCEPT;" + new_id + ";" + arr[2],arr[2],true);
-                                    send("SYNC;SIZE;" + canvas.getWidth() + ";" + canvas.getHeight() + ";" + arr[2],arr[2],true);
-                                    send("SYNC;LAYERS;1" + ";" + arr[2],arr[2],true); //Stub for multi-layers
-                                    send("SYNC;DATA;0;data" + ";" + arr[2],arr[2],true); //Stub for data sync
+                                    send("CONNECT;ACCEPT;" + new_id + ";" + arr[2]);
+                                    send("SYNC;SIZE;" + canvas.getWidth() + ";" + canvas.getHeight() + ";" + arr[2]);
+                                    send("SYNC;LAYERS;1" + ";" + arr[2]); //Stub for multi-layers
+                                    send("SYNC;DATA;0;data" + ";" + arr[2]); //Stub for data sync
                                 } else {
-                                    conn.send("CONNECT;REJECT;" + arr[2], InetAddress.getByName(arr[2]), true);
+                                    conn.send("CONNECT;REJECT;" + arr[2], true);
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
