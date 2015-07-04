@@ -13,9 +13,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import ru.mr123150.conn.Connection;
+import ru.mr123150.conn.MulticastConnection;
 import ru.mr123150.conn.User;
 
-import java.net.InetAddress;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -36,8 +36,6 @@ public class Controller implements Initializable{
     Connection hconn=null;
 
     double h,s,b;
-
-    int users=0;
 
     @Override
     public void initialize(URL url, ResourceBundle rb){
@@ -134,7 +132,7 @@ public class Controller implements Initializable{
     }
 
     public void redrawColor(){
-        if(conn!=null) {
+        if(conn!=null&&!conn.users.isEmpty()) {
             conn.users.get(0).setColor(h, s, b);
             send("CHANGE;COLOR;"+h+";"+s+";"+b);
         }
@@ -152,6 +150,7 @@ public class Controller implements Initializable{
     @FXML public void connect(){
         try{
             conn=new Connection("192.168.0.110",5050);
+            //hconn=new MulticastConnection("225.50.50.0",5051,false);
             hconn=new Connection("192.168.0.110",5051);
             listen();
             send("CONNECT;REQUEST;"+conn.address());
@@ -164,6 +163,7 @@ public class Controller implements Initializable{
     @FXML public void host(){
         try{
             hconn=new Connection(5050);
+            //conn=new MulticastConnection("225.50.50.0",5051,true);
             conn=new Connection(5051);
             System.out.println("//SERVER STARTED");
             listen();
@@ -201,7 +201,7 @@ public class Controller implements Initializable{
     public void send(String str){
         if(conn!=null&&(!conn.isServer()||conn.users.size()>0)) {
             try {
-                conn.send(str,true);
+                conn.send(str, true);
             }
             catch(Exception e){
                 e.printStackTrace();
@@ -211,7 +211,7 @@ public class Controller implements Initializable{
     }
 
     public void send(String str, boolean signature){
-        if(conn!=null&&(!conn.isServer()||conn.users.size()>0)) {
+        if(conn!=null/*&&(!conn.isServer()||conn.users.size()>0)*/) {
             try {
                 conn.send(str,signature);
             }

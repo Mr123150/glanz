@@ -2,6 +2,7 @@ package ru.mr123150.conn;
 
 import java.io.*;
 import java.net.*;
+import java.util.Enumeration;
 import java.util.Vector;
 
 /**
@@ -18,13 +19,19 @@ public class Connection{
 
     final int MAXSIZE=1024;
 
-    public Vector<User> users=new Vector<>();
+    public Vector<User> users=new Vector<User>();
+
+    public Connection(){
+        port=-1;
+        isServer=false;
+    }
 
     public Connection(int port) throws IOException{
-        this.serverAddress=InetAddress.getByName("255.255.255.255");
+        this.serverAddress=broadcast();
         this.port=port;
         isServer=true;
         socket=new DatagramSocket(port);
+        this.address=InetAddress.getLocalHost();
         users.add(new User());
     }
 
@@ -44,12 +51,28 @@ public class Connection{
         return address.getHostAddress();
     }
 
+    public InetAddress broadcast() throws SocketException{
+        Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+        while (interfaces.hasMoreElements()) {
+            NetworkInterface networkInterface = interfaces.nextElement();
+            if (networkInterface.isLoopback())
+                continue;    // Don't want to broadcast to the loopback interface
+            for (InterfaceAddress interfaceAddress :
+            networkInterface.getInterfaceAddresses()) {
+                InetAddress broadcast = interfaceAddress.getBroadcast();
+                if (broadcast != null)
+                    return broadcast;
+                }
+            }
+        return null;
+    }
+
     public void send(String msg,boolean signature) throws IOException{
         DatagramPacket packet;
         if(signature) msg+=(";"+(users.isEmpty()?-1:users.get(0).id()));
         packet=new DatagramPacket(msg.getBytes(),msg.length(),serverAddress,port);
-
         socket.send(packet);
+        System.out.println("//"+msg);
     }
 
     public String receive() throws IOException{
