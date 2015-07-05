@@ -103,7 +103,7 @@ public class Controller implements Initializable{
     public void resizeCanvas(double width, double height){
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         canvas.setWidth(width-leftBox.getWidth()-rightBox.getWidth());
-        canvas.setHeight(height-topBox.getHeight()-bottomBox.getHeight());
+        canvas.setHeight(height - topBox.getHeight() - bottomBox.getHeight());
         gc.beginPath();
         gc.moveTo(0, 0);
         gc.lineTo(canvas.getWidth(), 0);
@@ -122,7 +122,7 @@ public class Controller implements Initializable{
             hc.strokeLine(i, 0, i, hcolor.getHeight());
         }
         hc.setStroke(Color.BLACK);
-        hc.strokeOval(h/360*hcolor.getWidth()-hcolor.getHeight()/2,0,hcolor.getHeight(),hcolor.getHeight());
+        hc.strokeOval(h / 360 * hcolor.getWidth() - hcolor.getHeight() / 2, 0, hcolor.getHeight(), hcolor.getHeight());
         redrawColor();
     }
 
@@ -145,13 +145,13 @@ public class Controller implements Initializable{
             }
         }
         cc.setStroke(Color.BLACK);
-        cc.strokeOval(s*color.getWidth()-hcolor.getHeight()/2,(1-b)*color.getHeight()-hcolor.getHeight()/2,hcolor.getHeight(),hcolor.getHeight());
+        cc.strokeOval(s * color.getWidth() - hcolor.getHeight() / 2, (1 - b) * color.getHeight() - hcolor.getHeight() / 2, hcolor.getHeight(), hcolor.getHeight());
     }
 
     @FXML public void connect(){
         try{
             conn=new Connection("192.168.0.110",5050);
-            hconn=new Connection("192.168.0.110",5051);
+            hconn=new Connection(5051);
             listen();
             send("CONNECT;REQUEST;"+conn.getAddress());
         }
@@ -163,11 +163,11 @@ public class Controller implements Initializable{
     @FXML public void host(){
         try{
             hconn=new Connection(5050);
-            conn=new Connection(5051);
+            conn=new Connection(5051,false);
             System.out.println("//SERVER STARTED");
             listen();
             conn.users.insertElementAt(new User(), 0);
-            conn.users.get(0).setColor(h,s,b);
+            conn.users.get(0).setColor(h, s, b);
         }
 
         catch (Exception e){
@@ -198,7 +198,7 @@ public class Controller implements Initializable{
     }
 
     public void send(String str){
-        if(conn!=null&&(!conn.isHost()||conn.users.size()>0)) {
+        if(conn!=null&&(!conn.isServer()||conn.users.size()>0)) {
             try {
                 conn.send(str,true);
             }
@@ -210,7 +210,7 @@ public class Controller implements Initializable{
     }
 
     public void send(String str, boolean signature){
-        if(conn!=null&&(!conn.isHost()||conn.users.size()>0)) {
+        if(conn!=null&&(!conn.isServer()||conn.users.size()>0)) {
             try {
                 conn.send(str,signature);
             }
@@ -227,7 +227,7 @@ public class Controller implements Initializable{
         int id=Integer.parseInt(arr[arr.length-1]);
         switch(arr[0]){
             case "CONNECT":
-                if(conn.isHost()||arr[arr.length-2].equals(conn.getAddress())){
+                if(conn.isServer()||arr[arr.length-2].equals(conn.getAddress())){
                     switch(arr[1]) {
                         case "REQUEST":
                             int new_id=conn.users.lastElement().id()+1;
@@ -247,17 +247,22 @@ public class Controller implements Initializable{
                             }
                             break;
                         case "ACCEPT":
-                            conn.users.insertElementAt(new User(Integer.parseInt(arr[2])),0);
-                            conn.users.insertElementAt(new User(), 1);
-                            conn.users.get(0).setColor(h, s, b);
+                            try {
+                                conn.users.insertElementAt(new User(Integer.parseInt(arr[2])), 0);
+                                conn.users.insertElementAt(new User(), 1);
+                                conn.users.get(0).setColor(h, s, b);
+                            }
+                            catch (Exception e){
+                                e.printStackTrace();
+                            }
                         default:
                             break;
                     }
                 }
                 break;
             case "DISCONNECT":
-                if(conn.isHost()||Integer.parseInt(arr[1])==id||Integer.parseInt(arr[1])==0) {
-                    if (conn.isHost()) {
+                if(conn.isServer()||Integer.parseInt(arr[1])==id||Integer.parseInt(arr[1])==0) {
+                    if (conn.isServer()) {
                         conn.users.remove(conn.getUserById(id));
                     }
                     else {
@@ -267,7 +272,7 @@ public class Controller implements Initializable{
                     break;
                 }
             case "DRAW":
-                if(conn.isHost()||id!=conn.users.get(0).id()) {
+                if(conn.isServer()||id!=conn.users.get(0).id()) {
                     int user_id=conn.getUserById(id);
                     if(user_id!=-1){
                         gc.setStroke(conn.users.get(user_id).color());
@@ -278,21 +283,21 @@ public class Controller implements Initializable{
                     switch (arr[1]) {
                         case "CLICK":
                             gc.fillOval(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
-                            if (conn.isHost()) send(str,false);
+                            if (conn.isServer()) send(str,false);
                             break;
                         case "PRESS":
                             gc.beginPath();
                             gc.moveTo(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
-                            if (conn.isHost()) send(str,false);
+                            if (conn.isServer()) send(str,false);
                             break;
                         case "DRAG":
                             gc.lineTo(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
                             gc.stroke();
-                            if (conn.isHost()) send(str,false);
+                            if (conn.isServer()) send(str,false);
                             break;
                         case "RELEASE":
                             //gc.closePath();
-                            if (conn.isHost()) send(str,false);
+                            if (conn.isServer()) send(str,false);
                             break;
                         default:
                             break;
@@ -300,7 +305,7 @@ public class Controller implements Initializable{
                 }
                 break;
             case "CHANGE":
-                if(conn.isHost()||id!=conn.users.get(0).id()) {
+                if(conn.isServer()||id!=conn.users.get(0).id()) {
                     int user_id=conn.getUserById(id);
                     if(user_id!=-1) {
                         switch (arr[1]) {
