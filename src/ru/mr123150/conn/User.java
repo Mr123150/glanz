@@ -29,6 +29,11 @@ public class User {
         this.address=InetAddress.getLocalHost();
     }
 
+    public User(int id,String address) throws IOException{
+        this.id=id;
+        this.address=InetAddress.getByName(address);
+    }
+
     public int id(){
         return id;
     }

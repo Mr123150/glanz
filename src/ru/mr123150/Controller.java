@@ -58,7 +58,7 @@ public class Controller implements Initializable{
 
 
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED,event->{
-            if(conn!=null) gc.setStroke(conn.users.get(0).color());
+            if(conn!=null&&!conn.users.isEmpty()) gc.setStroke(conn.users.get(0).color());
             else gc.setStroke(Color.hsb(h,s,b));
             gc.fillOval(event.getX(), event.getY(), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
             send("DRAW;CLICK;"+event.getX()+";"+event.getY());
@@ -71,7 +71,7 @@ public class Controller implements Initializable{
         });
 
         canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
-            if(conn!=null) gc.setStroke(conn.users.get(0).color());
+            if(conn!=null&&!conn.users.isEmpty()) gc.setStroke(conn.users.get(0).color());
             else gc.setStroke(Color.hsb(h,s,b));
             gc.lineTo(event.getX(), event.getY());
             gc.stroke();
@@ -234,7 +234,7 @@ public class Controller implements Initializable{
                             try {
                                 conn.send("CONNECT;TEST", true);
                                 if (true) {
-                                    conn.users.add(new User(new_id));
+                                    conn.users.add(new User(new_id,arr[2]));
                                     send("CONNECT;ACCEPT;" + new_id + ";" + arr[2]);
                                     send("SYNC;SIZE;" + canvas.getWidth() + ";" + canvas.getHeight() + ";" + arr[2]);
                                     send("SYNC;LAYERS;1" + ";" + arr[2]); //Stub for multi-layers

@@ -14,7 +14,7 @@ public class Connection{
     protected InetAddress address;
     protected int port;
     protected boolean isServer;
-    protected boolean isBroadcast;
+    protected boolean isBroadcast=false;
 
     protected ServerSocket ss = null;
 
@@ -64,7 +64,7 @@ public class Connection{
         DataOutputStream out;
         Socket s;
         if(signature) msg+=(";"+(users.isEmpty()?-1:users.get(0).id()));
-
+        System.out.println("//"+msg);
         if (isServer){
             s = ss.accept();
             out = new DataOutputStream(s.getOutputStream());
@@ -85,7 +85,7 @@ public class Connection{
             }
         }
         else{
-            s = new Socket(address, port);
+            s = new Socket(server, port);
             OutputStream os = s.getOutputStream();
             out = new DataOutputStream(os);
             out.flush();
