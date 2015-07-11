@@ -34,6 +34,8 @@ public class Controller implements Initializable{
     Connection conn=null;
     Connection hconn=null;
 
+    boolean isServer=false;
+
     double h,s,b;
 
     int users=0;
@@ -58,7 +60,7 @@ public class Controller implements Initializable{
 
 
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED,event->{
-            if(conn!=null) gc.setStroke(conn.users.get(0).color());
+            if(conn!=null&&!conn.users.isEmpty()) gc.setStroke(conn.users.get(0).color());
             else gc.setStroke(Color.hsb(h,s,b));
             gc.fillOval(event.getX(), event.getY(), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
             send("DRAW;CLICK;"+event.getX()+";"+event.getY());
@@ -71,7 +73,7 @@ public class Controller implements Initializable{
         });
 
         canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
-            if(conn!=null) gc.setStroke(conn.users.get(0).color());
+            if(conn!=null&&!conn.users.isEmpty()) gc.setStroke(conn.users.get(0).color());
             else gc.setStroke(Color.hsb(h,s,b));
             gc.lineTo(event.getX(), event.getY());
             gc.stroke();
@@ -103,7 +105,7 @@ public class Controller implements Initializable{
     public void resizeCanvas(double width, double height){
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         canvas.setWidth(width-leftBox.getWidth()-rightBox.getWidth());
-        canvas.setHeight(height-topBox.getHeight()-bottomBox.getHeight());
+        canvas.setHeight(height - topBox.getHeight() - bottomBox.getHeight());
         gc.beginPath();
         gc.moveTo(0, 0);
         gc.lineTo(canvas.getWidth(), 0);
@@ -122,7 +124,7 @@ public class Controller implements Initializable{
             hc.strokeLine(i, 0, i, hcolor.getHeight());
         }
         hc.setStroke(Color.BLACK);
-        hc.strokeOval(h/360*hcolor.getWidth()-hcolor.getHeight()/2,0,hcolor.getHeight(),hcolor.getHeight());
+        hc.strokeOval(h / 360 * hcolor.getWidth() - hcolor.getHeight() / 2, 0, hcolor.getHeight(), hcolor.getHeight());
         redrawColor();
     }
 
@@ -145,15 +147,16 @@ public class Controller implements Initializable{
             }
         }
         cc.setStroke(Color.BLACK);
-        cc.strokeOval(s*color.getWidth()-hcolor.getHeight()/2,(1-b)*color.getHeight()-hcolor.getHeight()/2,hcolor.getHeight(),hcolor.getHeight());
+        cc.strokeOval(s * color.getWidth() - hcolor.getHeight() / 2, (1 - b) * color.getHeight() - hcolor.getHeight() / 2, hcolor.getHeight(), hcolor.getHeight());
     }
 
     @FXML public void connect(){
         try{
-            conn=new Connection("192.168.0.110",5050);
-            hconn=new Connection("192.168.0.110",5051);
+            conn=new Connection("192.168.0.100",5050);
+            hconn=new Connection(5051,false);
             listen();
             send("CONNECT;REQUEST;"+conn.getAddress());
+            isServer=false;
         }
         catch (Exception e){
             e.printStackTrace();
@@ -163,11 +166,12 @@ public class Controller implements Initializable{
     @FXML public void host(){
         try{
             hconn=new Connection(5050);
-            conn=new Connection(5051);
+            conn=new Connection(5051,true,true);
             System.out.println("//SERVER STARTED");
             listen();
+            isServer=true;
             conn.users.insertElementAt(new User(), 0);
-            conn.users.get(0).setColor(h,s,b);
+            conn.users.get(0).setColor(h, s, b);
         }
 
         catch (Exception e){
@@ -234,7 +238,7 @@ public class Controller implements Initializable{
                             try {
                                 conn.send("CONNECT;TEST", true);
                                 if (true) {
-                                    conn.users.add(new User(new_id));
+                                    conn.users.add(new User(new_id,arr[2]));
                                     send("CONNECT;ACCEPT;" + new_id + ";" + arr[2]);
                                     send("SYNC;SIZE;" + canvas.getWidth() + ";" + canvas.getHeight() + ";" + arr[2]);
                                     send("SYNC;LAYERS;1" + ";" + arr[2]); //Stub for multi-layers
@@ -247,9 +251,14 @@ public class Controller implements Initializable{
                             }
                             break;
                         case "ACCEPT":
-                            conn.users.insertElementAt(new User(Integer.parseInt(arr[2])),0);
-                            conn.users.insertElementAt(new User(), 1);
-                            conn.users.get(0).setColor(h, s, b);
+                            try {
+                                conn.users.insertElementAt(new User(Integer.parseInt(arr[2])), 0);
+                                conn.users.insertElementAt(new User(), 1);
+                                conn.users.get(0).setColor(h, s, b);
+                            }
+                            catch (Exception e){
+                                e.printStackTrace();
+                            }
                         default:
                             break;
                     }
