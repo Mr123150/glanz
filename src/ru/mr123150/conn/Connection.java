@@ -15,6 +15,7 @@ public class Connection{
     protected int port;
     protected boolean isServer;
     protected boolean isBroadcast=false;
+    protected boolean isHost;
 
     protected ServerSocket ss = null;
 
@@ -24,35 +25,44 @@ public class Connection{
         this.server =null;
         this.address=InetAddress.getLocalHost();
         this.port=port;
-        isServer=true;
+        this.isServer=true;
+        this.isHost=true;
         ss=new ServerSocket(port);
         users.add(new User());
     }
 
-    public Connection(int port, boolean isServer) throws IOException{
+    public Connection(int port, boolean isHost) throws IOException{
         this.server=null;
         this.address=InetAddress.getLocalHost();
         this.port=port;
-        this.isServer=isServer;
-        if(isServer){
-            ss=new ServerSocket(port);
-            users.add(new User());
-        }
-        else{
-            this.isBroadcast=true;
-        }
+        this.isServer=true;
+        this.isHost=isHost;
+        ss=new ServerSocket(port);
+        users.add(new User());
+    }
+
+    public Connection(int port, boolean isHost, boolean isBroadcast) throws IOException{
+        this.server=null;
+        this.address=InetAddress.getLocalHost();
+        this.port=port;
+        this.isServer=false;
+        this.isHost=isHost;
+        this.isBroadcast=isBroadcast;
     }
 
     public Connection(String server, int port) throws IOException{
         this.server=InetAddress.getByName(server);
         this.address=InetAddress.getLocalHost();
         this.port=port;
-        isServer=false;
+        this.isServer=false;
+        this.isHost=false;
     }
 
     public boolean isServer(){
         return isServer;
     }
+
+    public boolean isHost(){return isHost;}
 
     public String getAddress(){
 
@@ -65,16 +75,8 @@ public class Connection{
         Socket s;
         if(signature) msg+=(";"+(users.isEmpty()?-1:users.get(0).id()));
         System.out.println("//"+msg);
-        if (isServer){
-            s = ss.accept();
-            out = new DataOutputStream(s.getOutputStream());
-            out.flush();
-            out.writeUTF(msg);
-            out.flush();
-            s.close();
-        }
-        else if(isBroadcast){
-            for(User user:users.subList(1,users.size())) {
+        if(isBroadcast) {
+            for (User user : users.subList(1, users.size())) {
                 s = new Socket(user.address(), port);
                 OutputStream os = s.getOutputStream();
                 out = new DataOutputStream(os);
@@ -83,6 +85,14 @@ public class Connection{
                 out.flush();
                 s.close();
             }
+        }
+        else if (isServer){
+            s = ss.accept();
+            out = new DataOutputStream(s.getOutputStream());
+            out.flush();
+            out.writeUTF(msg);
+            out.flush();
+            s.close();
         }
         else{
             s = new Socket(server, port);
