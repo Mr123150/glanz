@@ -6,6 +6,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -27,12 +29,16 @@ public class Controller implements Initializable{
     @FXML VBox leftBox;
     @FXML VBox rightBox;
     @FXML HBox bottomBox;
+    @FXML Button undoBtn;
     GraphicsContext gc;
     GraphicsContext hc;
     GraphicsContext cc;
 
     Connection conn=null;
     Connection hconn=null;
+
+    WritableImage current=null;
+    WritableImage undo=null;
 
     boolean isServer=false;
 
@@ -58,12 +64,21 @@ public class Controller implements Initializable{
         //gc.closePath();
         gc.stroke();
 
+        if(undo==null){
+            undoBtn.setDisable(true);
+        }
 
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED,event->{
             if(conn!=null&&!conn.users.isEmpty()) gc.setStroke(conn.users.get(0).color());
             else gc.setStroke(Color.hsb(h,s,b));
             gc.fillOval(event.getX(), event.getY(), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
             send("DRAW;CLICK;"+event.getX()+";"+event.getY());
+
+            if(current!=null){
+                undo=current;
+                undoBtn.setDisable(false);
+            }
+            current=canvas.snapshot(null,null);
         });
 
         canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
@@ -150,12 +165,17 @@ public class Controller implements Initializable{
         cc.strokeOval(s * color.getWidth() - hcolor.getHeight() / 2, (1 - b) * color.getHeight() - hcolor.getHeight() / 2, hcolor.getHeight(), hcolor.getHeight());
     }
 
+    public void undo(){
+        gc.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
+        gc.drawImage(undo,0,0);
+    }
+
     @FXML public void connect(){
         try{
             conn=new Connection("192.168.0.110",5050);
             hconn=new Connection(5051,false);
             listen();
-            send("CONNECT;REQUEST;"+conn.getAddress());
+            send("CONNECT;REQUEST;" + conn.getAddress());
             isServer=false;
         }
         catch (Exception e){
