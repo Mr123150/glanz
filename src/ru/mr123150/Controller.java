@@ -152,7 +152,7 @@ public class Controller implements Initializable{
 
     @FXML public void connect(){
         try{
-            conn=new Connection("192.168.0.100",5050);
+            conn=new Connection("192.168.0.110",5050);
             hconn=new Connection(5051,false);
             listen();
             send("CONNECT;REQUEST;"+conn.getAddress());
@@ -328,6 +328,6 @@ public class Controller implements Initializable{
     }
 
     public void disconnect(){
-        send("DISCONNECT");
+        if(conn!=null&&conn.users.get(0).id()!=-1)send("DISCONNECT");
     }
 }
