@@ -130,6 +130,7 @@ public class Controller implements Initializable{
 
         undo.clear();
         undo.add(canvas.snapshot(null,null));
+        gc.drawImage(undo.get(0),0,0);
         //gc.closePath();
     }
 
@@ -167,22 +168,32 @@ public class Controller implements Initializable{
         cc.strokeOval(s * color.getWidth() - hcolor.getHeight() / 2, (1 - b) * color.getHeight() - hcolor.getHeight() / 2, hcolor.getHeight(), hcolor.getHeight());
     }
 
-    public void undo(){
+    @FXML public void undo(){
+        undo(true);
+    }
+
+    public void undo(boolean send){
         gc.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
         redo.add(undo.lastElement());
         undo.remove(undo.size()-1);
         gc.drawImage(undo.lastElement(),0,0);
         if(undo.size()<=1)undoBtn.setDisable(true);
         if(!redo.isEmpty())redoBtn.setDisable(false);
+        if(send)send("CHANGE;UNDO");
     }
 
-    public void redo(){
+    @FXML public void redo(){
+        redo(true);
+    }
+
+    public void redo(boolean send){
         gc.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
         undo.add(redo.lastElement());
         gc.drawImage(redo.lastElement(),0,0);
         redo.remove(redo.size()-1);
         if(redo.isEmpty())redoBtn.setDisable(true);
         if(undo.size()>1)undoBtn.setDisable(false);
+        if(send)send("CHANGE;REDO");
     }
 
     @FXML public void connect(){
@@ -322,6 +333,8 @@ public class Controller implements Initializable{
                     switch (arr[1]) {
                         case "CLICK":
                             gc.fillOval(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
+                            undo.add(canvas.snapshot(null,null));
+                            if(undo.size()>1)undoBtn.setDisable(false);
                             if (conn.isHost()) send(str,false);
                             break;
                         case "PRESS":
@@ -350,6 +363,14 @@ public class Controller implements Initializable{
                         switch (arr[1]) {
                             case "COLOR":
                                 conn.users.get(user_id).setColor(Double.parseDouble(arr[2]),Double.parseDouble(arr[3]),Double.parseDouble(arr[4]));
+                                break;
+                            case "UNDO":
+                                undo(false);
+                                if(conn.isHost())send(str,false);
+                                break;
+                            case "REDO":
+                                redo(false);
+                                if(conn.isHost())send(str,false);
                                 break;
                             default:
                                 break;
