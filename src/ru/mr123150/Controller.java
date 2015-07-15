@@ -31,6 +31,7 @@ public class Controller implements Initializable{
     @FXML VBox rightBox;
     @FXML HBox bottomBox;
     @FXML Button undoBtn;
+    @FXML Button redoBtn;
     GraphicsContext gc;
     GraphicsContext hc;
     GraphicsContext cc;
@@ -66,9 +67,8 @@ public class Controller implements Initializable{
         gc.stroke();
 
         undo.add(canvas.snapshot(null,null));
-        if(undo.size()<=1){
-            undoBtn.setDisable(true);
-        }
+        if(undo.size()<=1)undoBtn.setDisable(true);
+        if(redo.isEmpty())redoBtn.setDisable(true);
 
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED,event->{
             if(conn!=null&&!conn.users.isEmpty()) gc.setStroke(conn.users.get(0).color());
@@ -169,9 +169,20 @@ public class Controller implements Initializable{
 
     public void undo(){
         gc.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
+        redo.add(undo.lastElement());
         undo.remove(undo.size()-1);
         gc.drawImage(undo.lastElement(),0,0);
         if(undo.size()<=1)undoBtn.setDisable(true);
+        if(!redo.isEmpty())redoBtn.setDisable(false);
+    }
+
+    public void redo(){
+        gc.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
+        undo.add(redo.lastElement());
+        gc.drawImage(redo.lastElement(),0,0);
+        redo.remove(redo.size()-1);
+        if(redo.isEmpty())redoBtn.setDisable(true);
+        if(undo.size()>1)undoBtn.setDisable(false);
     }
 
     @FXML public void connect(){
