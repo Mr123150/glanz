@@ -19,6 +19,7 @@ import ru.mr123150.conn.User;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.Vector;
 
 public class Controller implements Initializable{
     @FXML Canvas canvas;
@@ -37,8 +38,8 @@ public class Controller implements Initializable{
     Connection conn=null;
     Connection hconn=null;
 
-    WritableImage current=null;
-    WritableImage undo=null;
+    Vector<WritableImage> undo=new Vector<>();
+    Vector<WritableImage> redo=new Vector<>();
 
     boolean isServer=false;
 
@@ -54,7 +55,7 @@ public class Controller implements Initializable{
         setHue(0);
         setColor(0, 0);
 
-        gc= canvas.getGraphicsContext2D();
+        gc=canvas.getGraphicsContext2D();
         gc.beginPath();
         gc.moveTo(0, 0);
         gc.lineTo(canvas.getWidth(),0);
@@ -64,7 +65,8 @@ public class Controller implements Initializable{
         //gc.closePath();
         gc.stroke();
 
-        if(undo==null){
+        undo.add(canvas.snapshot(null,null));
+        if(undo.size()<=1){
             undoBtn.setDisable(true);
         }
 
@@ -74,11 +76,8 @@ public class Controller implements Initializable{
             gc.fillOval(event.getX(), event.getY(), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
             send("DRAW;CLICK;"+event.getX()+";"+event.getY());
 
-            if(current!=null){
-                undo=current;
-                undoBtn.setDisable(false);
-            }
-            current=canvas.snapshot(null,null);
+            undo.add(canvas.snapshot(null,null));
+            if(undo.size()>1)undoBtn.setDisable(false);
         });
 
         canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
@@ -128,6 +127,9 @@ public class Controller implements Initializable{
         gc.lineTo(0, canvas.getHeight());
         gc.lineTo(0, 0);
         gc.stroke();
+
+        undo.clear();
+        undo.add(canvas.snapshot(null,null));
         //gc.closePath();
     }
 
@@ -167,7 +169,9 @@ public class Controller implements Initializable{
 
     public void undo(){
         gc.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
-        gc.drawImage(undo,0,0);
+        undo.remove(undo.size()-1);
+        gc.drawImage(undo.lastElement(),0,0);
+        if(undo.size()<=1)undoBtn.setDisable(true);
     }
 
     @FXML public void connect(){
