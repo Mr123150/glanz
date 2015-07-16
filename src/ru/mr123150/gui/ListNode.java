@@ -47,5 +47,6 @@ public class ListNode extends HBox{
     public void setParent(ScrollList parent){
         this.parent=parent;
         this.root=parent.root();
+        setWidth(parent.getWidth());
     }
 }
