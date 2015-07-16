@@ -16,6 +16,8 @@ import javafx.scene.paint.Color;
 
 import ru.mr123150.conn.Connection;
 import ru.mr123150.conn.User;
+import ru.mr123150.gui.ScrollList;
+import ru.mr123150.gui.UserNode;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -32,6 +34,8 @@ public class Controller implements Initializable{
     @FXML HBox bottomBox;
     @FXML Button undoBtn;
     @FXML Button redoBtn;
+
+    @FXML ScrollList userScroll;
     GraphicsContext gc;
     GraphicsContext hc;
     GraphicsContext cc;
@@ -69,7 +73,7 @@ public class Controller implements Initializable{
         undo.add(canvas.snapshot(null,null));
         if(undo.size()<=1)undoBtn.setDisable(true);
         if(redo.isEmpty())redoBtn.setDisable(true);
-
+        userScroll.init(this);
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED,event->{
             if(conn!=null&&!conn.users.isEmpty()) gc.setStroke(conn.users.get(0).color());
             else gc.setStroke(Color.hsb(h,s,b));
@@ -285,6 +289,7 @@ public class Controller implements Initializable{
                                 conn.send("CONNECT;TEST", true);
                                 if (true) {
                                     conn.users.add(new User(new_id,arr[2]));
+                                    userScroll.add(new UserNode(new_id,arr[2],true));
                                     send("CONNECT;ACCEPT;" + new_id + ";" + arr[2]);
                                     send("SYNC;SIZE;" + canvas.getWidth() + ";" + canvas.getHeight() + ";" + arr[2]);
                                     send("SYNC;LAYERS;1" + ";" + arr[2]); //Stub for multi-layers
@@ -298,8 +303,10 @@ public class Controller implements Initializable{
                             break;
                         case "ACCEPT":
                             try {
-                                conn.users.insertElementAt(new User(Integer.parseInt(arr[2])), 0);
+                                conn.users.insertElementAt(new User(Integer.parseInt(arr[2])),0);
                                 conn.users.insertElementAt(new User(), 1);
+                                userScroll.add(new UserNode(0,conn.getAddress(),false));
+                                userScroll.add(new UserNode(Integer.parseInt(arr[2]),arr[3],false));
                                 conn.users.get(0).setColor(h, s, b);
                             }
                             catch (Exception e){

@@ -1,0 +1,7 @@
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+<fx:root type="ru.mr123150.gui.ListNode" xmlns:fx="http://javafx.com/fxml" prefHeight="30" alignment="CENTER_LEFT">
+    <Label fx:id="idLabel" prefWidth="30" textAlignment="CENTER"/>
+    <Label fx:id="addressLabel"/>
+    <Button fx:id="disconnectBtn" text="Disconnect" onAction="#disconnect" />
+</fx:root>
