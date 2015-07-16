@@ -6,6 +6,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -17,6 +19,7 @@ import ru.mr123150.conn.User;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.Vector;
 
 public class Controller implements Initializable{
     @FXML Canvas canvas;
@@ -27,12 +30,17 @@ public class Controller implements Initializable{
     @FXML VBox leftBox;
     @FXML VBox rightBox;
     @FXML HBox bottomBox;
+    @FXML Button undoBtn;
+    @FXML Button redoBtn;
     GraphicsContext gc;
     GraphicsContext hc;
     GraphicsContext cc;
 
     Connection conn=null;
     Connection hconn=null;
+
+    Vector<WritableImage> undo=new Vector<>();
+    Vector<WritableImage> redo=new Vector<>();
 
     boolean isServer=false;
 
@@ -48,7 +56,7 @@ public class Controller implements Initializable{
         setHue(0);
         setColor(0, 0);
 
-        gc= canvas.getGraphicsContext2D();
+        gc=canvas.getGraphicsContext2D();
         gc.beginPath();
         gc.moveTo(0, 0);
         gc.lineTo(canvas.getWidth(),0);
@@ -58,12 +66,18 @@ public class Controller implements Initializable{
         //gc.closePath();
         gc.stroke();
 
+        undo.add(canvas.snapshot(null,null));
+        if(undo.size()<=1)undoBtn.setDisable(true);
+        if(redo.isEmpty())redoBtn.setDisable(true);
 
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED,event->{
             if(conn!=null&&!conn.users.isEmpty()) gc.setStroke(conn.users.get(0).color());
             else gc.setStroke(Color.hsb(h,s,b));
             gc.fillOval(event.getX(), event.getY(), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
             send("DRAW;CLICK;"+event.getX()+";"+event.getY());
+
+            undo.add(canvas.snapshot(null,null));
+            if(undo.size()>1)undoBtn.setDisable(false);
         });
 
         canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
@@ -113,6 +127,10 @@ public class Controller implements Initializable{
         gc.lineTo(0, canvas.getHeight());
         gc.lineTo(0, 0);
         gc.stroke();
+
+        undo.clear();
+        undo.add(canvas.snapshot(null,null));
+        gc.drawImage(undo.get(0),0,0);
         //gc.closePath();
     }
 
@@ -150,12 +168,40 @@ public class Controller implements Initializable{
         cc.strokeOval(s * color.getWidth() - hcolor.getHeight() / 2, (1 - b) * color.getHeight() - hcolor.getHeight() / 2, hcolor.getHeight(), hcolor.getHeight());
     }
 
+    @FXML public void undo(){
+        undo(true);
+    }
+
+    public void undo(boolean send){
+        gc.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
+        redo.add(undo.lastElement());
+        undo.remove(undo.size()-1);
+        gc.drawImage(undo.lastElement(),0,0);
+        if(undo.size()<=1)undoBtn.setDisable(true);
+        if(!redo.isEmpty())redoBtn.setDisable(false);
+        if(send)send("CHANGE;UNDO");
+    }
+
+    @FXML public void redo(){
+        redo(true);
+    }
+
+    public void redo(boolean send){
+        gc.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
+        undo.add(redo.lastElement());
+        gc.drawImage(redo.lastElement(),0,0);
+        redo.remove(redo.size()-1);
+        if(redo.isEmpty())redoBtn.setDisable(true);
+        if(undo.size()>1)undoBtn.setDisable(false);
+        if(send)send("CHANGE;REDO");
+    }
+
     @FXML public void connect(){
         try{
             conn=new Connection("192.168.0.110",5050);
             hconn=new Connection(5051,false);
             listen();
-            send("CONNECT;REQUEST;"+conn.getAddress());
+            send("CONNECT;REQUEST;" + conn.getAddress());
             isServer=false;
         }
         catch (Exception e){
@@ -287,6 +333,8 @@ public class Controller implements Initializable{
                     switch (arr[1]) {
                         case "CLICK":
                             gc.fillOval(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
+                            undo.add(canvas.snapshot(null,null));
+                            if(undo.size()>1)undoBtn.setDisable(false);
                             if (conn.isHost()) send(str,false);
                             break;
                         case "PRESS":
@@ -315,6 +363,14 @@ public class Controller implements Initializable{
                         switch (arr[1]) {
                             case "COLOR":
                                 conn.users.get(user_id).setColor(Double.parseDouble(arr[2]),Double.parseDouble(arr[3]),Double.parseDouble(arr[4]));
+                                if(conn.isHost())send(str,false);
+                                break;
+                            case "UNDO":
+                                undo(false);
+                                if(conn.isHost())send(str,false);
+                                break;
+                            case "REDO":
+                                redo(false);
                                 if(conn.isHost())send(str,false);
                                 break;
                             default:
