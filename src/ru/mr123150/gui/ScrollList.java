@@ -15,7 +15,7 @@ public class ScrollList extends ScrollPane {
 
     protected VBox listBox;
     protected Vector<ListNode> list;
-    protected Controller parent;
+    protected Controller root;
 
     public ScrollList(){
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("scroll_list.fxml"));
@@ -33,9 +33,12 @@ public class ScrollList extends ScrollPane {
         setContent(listBox);
     }
 
-    public void init(Controller parent){this.parent=parent;}
+    public void init(Controller root){this.root=root;}
+
+    public Controller root(){return this.root;}
 
     public void add(ListNode node){
+        node.setParent(this);
         list.add(node);
         listBox.getChildren().add(node);
         //refresh();
@@ -44,7 +47,6 @@ public class ScrollList extends ScrollPane {
     public void remove(ListNode node){
         list.remove(node);
         listBox.getChildren().remove(node);
-        refresh();
     }
 
     public void refresh(){

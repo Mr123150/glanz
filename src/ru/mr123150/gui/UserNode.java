@@ -19,7 +19,6 @@ import java.io.IOException;
  */
 public class UserNode extends ListNode{
 
-    @FXML Label idLabel;
     @FXML Label addressLabel;
 
     public UserNode(){
@@ -47,6 +46,13 @@ public class UserNode extends ListNode{
 
         idLabel.setText(id+"");
         addressLabel.setText(address);
+    }
+
+    @FXML public void disconnect(){
+        if(parent!=null) {
+            root.send("DISCONNECT;" + idLabel.getText(), false);
+            parent.remove(this);
+        }
     }
 }
 
