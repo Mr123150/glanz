@@ -241,7 +241,7 @@ public class Controller implements Initializable{
                                 conn.send("CONNECT;TEST", true);
                                 if (true) {
                                     conn.users.add(new User(new_id));
-                                    userScroll.add(new UserNode(new_id,arr[2],conn.isHost()));
+                                    userScroll.add(new UserNode(new_id,arr[2],true));
                                     send("CONNECT;ACCEPT;" + new_id + ";" + arr[2]);
                                     send("SYNC;SIZE;" + canvas.getWidth() + ";" + canvas.getHeight() + ";" + arr[2]);
                                     send("SYNC;LAYERS;1" + ";" + arr[2]); //Stub for multi-layers
@@ -256,6 +256,8 @@ public class Controller implements Initializable{
                         case "ACCEPT":
                             conn.users.insertElementAt(new User(Integer.parseInt(arr[2])),0);
                             conn.users.insertElementAt(new User(), 1);
+                            userScroll.add(new UserNode(0,conn.getAddress(),false));
+                            userScroll.add(new UserNode(Integer.parseInt(arr[2]),arr[3],false));
                             conn.users.get(0).setColor(h, s, b);
                         default:
                             break;
