@@ -3,27 +3,25 @@ package ru.mr123150;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
-import javafx.stage.Stage;
 import ru.mr123150.conn.Connection;
 import ru.mr123150.conn.User;
 import ru.mr123150.gui.ScrollList;
 import ru.mr123150.gui.UserNode;
 
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Vector;
 
@@ -205,22 +203,46 @@ public class Controller implements Initializable{
     }
 
     @FXML public void connect(){
-        Parent root;
-        try{
-            conn=new Connection("192.168.0.110",5050);
-            hconn=new Connection(5051,false);
-            listen();
-            send("CONNECT;REQUEST;" + conn.getAddress());
-            isServer=false;
+        Dialog<Vector<String>> connectDialog = new Dialog<>();
+        connectDialog.setTitle("Connect to remote host");
+        ButtonType connectBtnType=new ButtonType("Connect", ButtonBar.ButtonData.OK_DONE);
+        connectDialog.getDialogPane().getButtonTypes().addAll(connectBtnType, ButtonType.CANCEL);
+        /*try{connectDialog.getDialogPane().setContent(FXMLLoader.load(getClass().getResource("connect.fxml")));}
+        catch (Exception e){e.printStackTrace();}
+        final TextField connectAddress;*/
+        GridPane grid=new GridPane();
+        grid.add(new Label("Host address"),0,0);
+        TextField connAddress = new TextField();
+        grid.add(connAddress,1,0);
+        connectDialog.getDialogPane().setContent(grid);
+        connectDialog.setResultConverter(dialogButton -> {
+            if (dialogButton == connectBtnType) {
+                Vector<String> res=new Vector<>();
+                res.add(connAddress.getText());
+                return res;
+            }
+            return null;
+        });
+        Optional<Vector<String>> result = connectDialog.showAndWait();
+        result.ifPresent(data->{
+            try{
+                conn=new Connection("192.168.0.110",5050);
+                hconn=new Connection(5051,false);
+                listen();
+                send("CONNECT;REQUEST;" + conn.getAddress());
+                isServer=false;
 
-            root= FXMLLoader.load(getClass().getResource("connect.fxml"));
+            /*root= FXMLLoader.load(getClass().getResource("connect.fxml"));
             Stage stage=new Stage();
             stage.setScene(new Scene(root,500,500));
-            stage.show();
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
+            stage.show();*/
+
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+        });
+
     }
 
     @FXML public void host(){
