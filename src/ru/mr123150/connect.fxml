@@ -1,0 +1,7 @@
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Label?>
+<GridPane fx:controller="ru.mr123150.ConnectController" xmlns:fx="http://javafx.com/fxml">
+    <Label text="Host address"/>
+    <TextField fx:id="address" GridPane.columnIndex="1"  GridPane.rowIndex="0"/>
+</GridPane>
