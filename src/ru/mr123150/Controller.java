@@ -213,7 +213,7 @@ public class Controller implements Initializable{
             send("CONNECT;REQUEST;" + conn.getAddress());
             isServer=false;
 
-            root= FXMLLoader.load(getClass().getResource("/stages/connect.fxml"));
+            root= FXMLLoader.load(getClass().getResource("connect.fxml"));
             Stage stage=new Stage();
             stage.setScene(new Scene(root,500,500));
             stage.show();
