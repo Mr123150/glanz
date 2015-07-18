@@ -29,6 +29,10 @@ public class Main extends Application {
             controller.disconnect();
         });
 
+        stage.setX(primaryScreenBounds.getMinX());
+        stage.setY(primaryScreenBounds.getMinY());
+        stage.setWidth(primaryScreenBounds.getWidth());
+        stage.setHeight(primaryScreenBounds.getHeight());
         stage.setMaximized(true);
 
         stage.show();
