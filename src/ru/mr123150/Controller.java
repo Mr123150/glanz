@@ -48,8 +48,6 @@ public class Controller implements Initializable{
     Vector<WritableImage> undo=new Vector<>();
     Vector<WritableImage> redo=new Vector<>();
 
-    boolean isServer=false;
-
     double h,s,b;
 
     int users=0;
@@ -207,9 +205,6 @@ public class Controller implements Initializable{
         connectDialog.setTitle("Connect to remote host");
         ButtonType connectBtnType=new ButtonType("Connect", ButtonBar.ButtonData.OK_DONE);
         connectDialog.getDialogPane().getButtonTypes().addAll(connectBtnType, ButtonType.CANCEL);
-        /*try{connectDialog.getDialogPane().setContent(FXMLLoader.load(getClass().getResource("connect.fxml")));}
-        catch (Exception e){e.printStackTrace();}
-        final TextField connectAddress;*/
         GridPane grid=new GridPane();
         grid.add(new Label("Host address"),0,0);
         TextField connAddress = new TextField();
@@ -226,17 +221,10 @@ public class Controller implements Initializable{
         Optional<Vector<String>> result = connectDialog.showAndWait();
         result.ifPresent(data->{
             try{
-                conn=new Connection("192.168.0.110",5050);
+                conn=new Connection(data.get(0),5050);
                 hconn=new Connection(5051,false);
                 listen();
                 send("CONNECT;REQUEST;" + conn.getAddress());
-                isServer=false;
-
-            /*root= FXMLLoader.load(getClass().getResource("connect.fxml"));
-            Stage stage=new Stage();
-            stage.setScene(new Scene(root,500,500));
-            stage.show();*/
-
             }
             catch (Exception e){
                 e.printStackTrace();
@@ -251,7 +239,6 @@ public class Controller implements Initializable{
             conn=new Connection(5051,true,true);
             System.out.println("//SERVER STARTED");
             listen();
-            isServer=true;
             conn.users.insertElementAt(new User(), 0);
             conn.users.get(0).setColor(h, s, b);
         }
