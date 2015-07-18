@@ -3,10 +3,7 @@ package ru.mr123150;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
@@ -17,7 +14,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
-import javafx.stage.Stage;
 import ru.mr123150.conn.Connection;
 import ru.mr123150.conn.User;
 import ru.mr123150.gui.ScrollList;
@@ -184,7 +180,7 @@ public class Controller implements Initializable{
         gc.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
         redo.add(undo.lastElement());
         undo.remove(undo.size()-1);
-        gc.drawImage(undo.lastElement(), 0, 0);
+        gc.drawImage(undo.lastElement(),0,0);
         if(undo.size()<=1)undoBtn.setDisable(true);
         if(!redo.isEmpty())redoBtn.setDisable(false);
         if(send)send("CHANGE;UNDO");
@@ -198,25 +194,19 @@ public class Controller implements Initializable{
         gc.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
         undo.add(redo.lastElement());
         gc.drawImage(redo.lastElement(),0,0);
-        redo.remove(redo.size() - 1);
+        redo.remove(redo.size()-1);
         if(redo.isEmpty())redoBtn.setDisable(true);
         if(undo.size()>1)undoBtn.setDisable(false);
         if(send)send("CHANGE;REDO");
     }
 
     @FXML public void connect(){
-        Parent root;
         try{
             conn=new Connection("192.168.0.110",5050);
             hconn=new Connection(5051,false);
             listen();
             send("CONNECT;REQUEST;" + conn.getAddress());
             isServer=false;
-
-            root= FXMLLoader.load(getClass().getResource("/stages/connect.fxml"));
-            Stage stage=new Stage();
-            stage.setScene(new Scene(root,500,500));
-            stage.show();
         }
         catch (Exception e){
             e.printStackTrace();
@@ -315,8 +305,8 @@ public class Controller implements Initializable{
                             try {
                                 conn.users.insertElementAt(new User(Integer.parseInt(arr[2])),0);
                                 conn.users.insertElementAt(new User(), 1);
-                                userScroll.add(new UserNode(0, conn.getAddress(), false));
-                                userScroll.add(new UserNode(Integer.parseInt(arr[2]), arr[3], false));
+                                userScroll.add(new UserNode(0,conn.getAddress(),false));
+                                userScroll.add(new UserNode(Integer.parseInt(arr[2]),arr[3],false));
                                 conn.users.get(0).setColor(h, s, b);
                             }
                             catch (Exception e){
