@@ -50,7 +50,7 @@ public class Controller implements Initializable{
 
     double h,s,b;
 
-    int users=0;
+    Dialog<ButtonType> spinner = new Dialog<>();
 
     @Override
     public void initialize(URL url, ResourceBundle rb){
@@ -118,6 +118,10 @@ public class Controller implements Initializable{
         color.addEventHandler(MouseEvent.MOUSE_DRAGGED, event ->{
             setColor(event.getX()/color.getWidth(), 1-event.getY()/color.getHeight());
         });
+
+        spinner.setTitle("Please wait");
+        spinner.setContentText("Waiting for host response");
+        spinner.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL);
     }
 
     public void resizeCanvas(double width, double height){
@@ -212,7 +216,7 @@ public class Controller implements Initializable{
         connectDialog.getDialogPane().setContent(grid);
         connectDialog.setResultConverter(dialogButton -> {
             if (dialogButton == connectBtnType) {
-                Vector<String> res=new Vector<>();
+                Vector<String> res=new Vector<String>();
                 res.add(connAddress.getText());
                 return res;
             }
@@ -225,6 +229,7 @@ public class Controller implements Initializable{
                 hconn=new Connection(5051,false);
                 listen();
                 send("CONNECT;REQUEST;" + conn.getAddress());
+                spinner.show();
             }
             catch (Exception e){
                 e.printStackTrace();
@@ -308,7 +313,7 @@ public class Controller implements Initializable{
                                 conn.users.add(new User(new_id,arr[2]));
                                 Alert alert=new Alert(Alert.AlertType.CONFIRMATION);
                                 alert.setTitle("Connection request");
-                                alert.setContentText("Connection request from IP "+arr[2]+". Allow?");
+                                alert.setContentText("Connection request from IP " + arr[2] + ". Allow?");
                                 send("CONNECT;TEST");
                                 Optional<ButtonType> result=alert.showAndWait();
                                 if (result.get() == ButtonType.OK){
@@ -332,10 +337,21 @@ public class Controller implements Initializable{
                                 userScroll.add(new UserNode(0, conn.getAddress(), false));
                                 userScroll.add(new UserNode(Integer.parseInt(arr[2]), arr[3], false));
                                 conn.users.get(0).setColor(h, s, b);
+                                if(spinner.isShowing())spinner.hide();
                             }
                             catch (Exception e){
                                 e.printStackTrace();
                             }
+                            break;
+                        case "REJECT":
+                            if(spinner.isShowing())spinner.hide();
+                            conn=null;
+                            hconn=null;
+                            Alert alert=new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle("Connection rejected");
+                            alert.setContentText("Connection request was rejected by host");
+                            alert.show();
+                            break;
                         default:
                             break;
                     }
