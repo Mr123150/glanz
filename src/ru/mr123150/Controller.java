@@ -45,8 +45,8 @@ public class Controller implements Initializable{
     Connection conn=null;
     Connection hconn=null;
 
-    Vector<WritableImage> undo=new Vector<>();
-    Vector<WritableImage> redo=new Vector<>();
+    Vector<WritableImage> undo=new Vector<WritableImage>();
+    Vector<WritableImage> redo=new Vector<WritableImage>();
 
     double h,s,b;
 
@@ -303,18 +303,23 @@ public class Controller implements Initializable{
                 if(conn.isHost()||arr[arr.length-2].equals(conn.getAddress())){
                     switch(arr[1]) {
                         case "REQUEST":
-                            int new_id=conn.users.lastElement().id()+1;
                             try {
-                                conn.send("CONNECT;TEST", true);
-                                if (true) {
-                                    conn.users.add(new User(new_id,arr[2]));
+                                int new_id=conn.users.lastElement().id()+1;
+                                conn.users.add(new User(new_id,arr[2]));
+                                Alert alert=new Alert(Alert.AlertType.CONFIRMATION);
+                                alert.setTitle("Connection request");
+                                alert.setContentText("Connection request from IP "+arr[2]+". Allow?");
+                                send("CONNECT;TEST");
+                                Optional<ButtonType> result=alert.showAndWait();
+                                if (result.get() == ButtonType.OK){
                                     userScroll.add(new UserNode(new_id,arr[2],true));
                                     send("CONNECT;ACCEPT;" + new_id + ";" + arr[2]);
                                     send("SYNC;SIZE;" + canvas.getWidth() + ";" + canvas.getHeight() + ";" + arr[2]);
                                     send("SYNC;LAYERS;1" + ";" + arr[2]); //Stub for multi-layers
                                     send("SYNC;DATA;0;data" + ";" + arr[2]); //Stub for data sync
                                 } else {
-                                    conn.send("CONNECT;REJECT;" + arr[2], true);
+                                    send("CONNECT;REJECT;" + arr[2]);
+                                    conn.users.remove(conn.users.size()-1);
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
