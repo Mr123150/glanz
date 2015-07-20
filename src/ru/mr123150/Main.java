@@ -21,7 +21,10 @@ public class Main extends Application {
 
         Controller controller=loader.getController();
 
-        Scene scene=new Scene(root, 300, 275);
+        double width=primaryScreenBounds.getWidth();
+        double height=primaryScreenBounds.getHeight();
+
+        Scene scene=new Scene(root, width, height);
         stage.setTitle("Canvas");
         stage.setScene(scene);
 
@@ -29,15 +32,10 @@ public class Main extends Application {
             controller.disconnect();
         });
 
-        stage.setX(primaryScreenBounds.getMinX());
-        stage.setY(primaryScreenBounds.getMinY());
-        stage.setWidth(primaryScreenBounds.getWidth());
-        stage.setHeight(primaryScreenBounds.getHeight());
-        stage.setMaximized(true);
 
         stage.show();
 
-        controller.resizeCanvas(primaryScreenBounds.getWidth(),primaryScreenBounds.getHeight());
+        controller.resizeCanvas(stage.getWidth(),stage.getHeight());
     }
 
 

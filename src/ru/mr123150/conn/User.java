@@ -40,6 +40,8 @@ public class User {
 
     public InetAddress address(){return address;}
 
+    public String addressText(){return address.getHostAddress();}
+
     public void setId(int id){
         this.id=id;
     }
@@ -47,6 +49,8 @@ public class User {
     public Color color(){
         return Color.hsb(h,s,b);
     }
+
+    public String colorText(){return h+";"+s+";"+b;}
 
     public void setColor(double h, double s, double b){
         this.h=h;

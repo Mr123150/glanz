@@ -74,14 +74,14 @@ public class Controller implements Initializable{
         if(undo.size()<=1)undoBtn.setDisable(true);
         if(redo.isEmpty())redoBtn.setDisable(true);
         userScroll.init(this);
-        canvas.addEventHandler(MouseEvent.MOUSE_CLICKED,event->{
-            if(conn!=null&&!conn.users.isEmpty()) gc.setStroke(conn.users.get(0).color());
-            else gc.setStroke(Color.hsb(h,s,b));
+        canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            if (conn != null && !conn.users.isEmpty()) gc.setStroke(conn.users.get(0).color());
+            else gc.setStroke(Color.hsb(h, s, b));
             gc.fillOval(event.getX(), event.getY(), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
-            send("DRAW;CLICK;"+event.getX()+";"+event.getY());
+            send("DRAW;CLICK;" + event.getX() + ";" + event.getY());
 
-            undo.add(canvas.snapshot(null,null));
-            if(undo.size()>1)undoBtn.setDisable(false);
+            undo.add(canvas.snapshot(null, null));
+            if (undo.size() > 1) undoBtn.setDisable(false);
         });
 
         canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
@@ -104,7 +104,7 @@ public class Controller implements Initializable{
         });
 
         hcolor.addEventHandler(MouseEvent.MOUSE_PRESSED, event ->{
-            setHue(event.getX()/hcolor.getWidth()*360);
+            setHue(event.getX() / hcolor.getWidth() * 360);
         });
 
         hcolor.addEventHandler(MouseEvent.MOUSE_DRAGGED, event ->{
@@ -112,11 +112,11 @@ public class Controller implements Initializable{
         });
 
         color.addEventHandler(MouseEvent.MOUSE_PRESSED, event ->{
-            setColor(event.getX()/color.getWidth(), 1-event.getY()/color.getHeight());
+            setColor(event.getX() / color.getWidth(), 1 - event.getY() / color.getHeight());
         });
 
-        color.addEventHandler(MouseEvent.MOUSE_DRAGGED, event ->{
-            setColor(event.getX()/color.getWidth(), 1-event.getY()/color.getHeight());
+        color.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
+            setColor(event.getX() / color.getWidth(), 1 - event.getY() / color.getHeight());
         });
     }
 
@@ -291,9 +291,12 @@ public class Controller implements Initializable{
                                     conn.users.add(new User(new_id,arr[2]));
                                     userScroll.add(new UserNode(new_id,arr[2],true));
                                     send("CONNECT;ACCEPT;" + new_id + ";" + arr[2]);
-                                    send("SYNC;SIZE;" + canvas.getWidth() + ";" + canvas.getHeight() + ";" + arr[2]);
-                                    send("SYNC;LAYERS;1" + ";" + arr[2]); //Stub for multi-layers
-                                    send("SYNC;DATA;0;data" + ";" + arr[2]); //Stub for data sync
+                                    send("SYNC;"+ new_id +";SIZE;" + canvas.getWidth() + ";" + canvas.getHeight() + ";" + arr[2]);
+                                    send("SYNC;"+ new_id +";LAYERS;1"); //Stub for multi-layers
+                                    send("SYNC;"+ new_id +";DATA;0;data"); //Stub for data sync
+                                    for(User user:conn.users){
+                                        send("SYNC;"+ new_id +";USER;"+user.id()+";"+user.addressText()+";"+user.colorText());
+                                    }
                                 } else {
                                     conn.send("CONNECT;REJECT;" + arr[2], true);
                                 }
@@ -357,6 +360,28 @@ public class Controller implements Initializable{
                         case "RELEASE":
                             //gc.closePath();
                             if (conn.isHost()) send(str,false);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                break;
+            case "SYNC":
+                if(Integer.parseInt(arr[1])==conn.users.get(0).id()){
+                    switch(arr[2]){
+                        case "USER":
+                            try {
+                                int sync_id=Integer.parseInt(arr[3]);
+                                if(sync_id!=conn.users.get(0).id()&&sync_id!=0) {
+                                    User new_user = new User(sync_id, arr[4]);
+                                    new_user.setColor(Double.parseDouble(arr[5]), Double.parseDouble(arr[6]), Double.parseDouble(arr[7]));
+                                    conn.users.add(new_user);
+                                    userScroll.add(new UserNode(Integer.parseInt(arr[3]), arr[4], false));
+                                }
+                            }
+                            catch (Exception e){
+                                e.printStackTrace();
+                            }
                             break;
                         default:
                             break;
