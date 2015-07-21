@@ -16,8 +16,8 @@ public class User {
     protected double s;
     protected double b;
 
-    public float x;
-    public float y;
+    protected double x;
+    protected double y;
 
     public User() throws IOException{
         this.id=0;
@@ -52,9 +52,18 @@ public class User {
 
     public String colorText(){return h+";"+s+";"+b;}
 
+    public double x(){return x;}
+
+    public double y(){return y;}
+
     public void setColor(double h, double s, double b){
         this.h=h;
         this.s=s;
         this.b=b;
+    }
+
+    public void setCoord(double x, double y){
+        this.x=x;
+        this.y=y;
     }
 }
