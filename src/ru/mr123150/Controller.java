@@ -85,13 +85,22 @@ public class Controller implements Initializable{
         });
 
         canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
-            gc.beginPath();
-            gc.moveTo(event.getX(), event.getY());
+            if(conn!=null&&!conn.users.isEmpty()) {
+                conn.users.get(0).setCoord(event.getX(),event.getY());
+            }
+            else {
+                gc.beginPath();
+                gc.moveTo(event.getX(), event.getY());
+            }
             send("DRAW;PRESS;"+event.getX()+";"+event.getY());
         });
 
         canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
-            if(conn!=null&&!conn.users.isEmpty()) gc.setStroke(conn.users.get(0).color());
+            if(conn!=null&&!conn.users.isEmpty()) {
+                gc.setStroke(conn.users.get(0).color());
+                gc.moveTo(conn.users.get(0).x(),conn.users.get(0).y());
+                conn.users.get(0).setCoord(event.getX(),event.getY());
+            }
             else gc.setStroke(Color.hsb(h,s,b));
             gc.lineTo(event.getX(), event.getY());
             gc.stroke();
@@ -348,12 +357,15 @@ public class Controller implements Initializable{
                             if (conn.isHost()) send(str,false);
                             break;
                         case "PRESS":
-                            gc.beginPath();
-                            gc.moveTo(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
+                            //gc.beginPath();
+                            //gc.moveTo(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
+                            conn.users.get(user_id).setCoord(Double.parseDouble(arr[2]),Double.parseDouble(arr[3]));
                             if (conn.isHost()) send(str,false);
                             break;
                         case "DRAG":
+                            gc.moveTo(conn.users.get(user_id).x(), conn.users.get(user_id).y());
                             gc.lineTo(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
+                            conn.users.get(user_id).setCoord(Double.parseDouble(arr[2]),Double.parseDouble(arr[3]));
                             gc.stroke();
                             if (conn.isHost()) send(str,false);
                             break;
