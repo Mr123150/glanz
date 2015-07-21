@@ -75,9 +75,9 @@ public class Controller implements Initializable{
         if(redo.isEmpty())redoBtn.setDisable(true);
         userScroll.init(this);
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-            if (conn != null && !conn.users.isEmpty()) gc.setStroke(conn.users.get(0).color());
-            else gc.setStroke(Color.hsb(h, s, b));
-            gc.fillOval(event.getX(), event.getY(), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
+            if (conn != null && !conn.users.isEmpty()) gc.setFill(conn.users.get(0).color());
+            else gc.setFill(Color.hsb(h, s, b));
+            gc.fillOval(event.getX(), event.getY(), gc.getLineWidth(), gc.getLineWidth());
             send("DRAW;CLICK;" + event.getX() + ";" + event.getY());
 
             undo.add(canvas.snapshot(null, null));
@@ -97,6 +97,7 @@ public class Controller implements Initializable{
 
         canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
             if(conn!=null&&!conn.users.isEmpty()) {
+                gc.beginPath();
                 gc.setStroke(conn.users.get(0).color());
                 gc.moveTo(conn.users.get(0).x(),conn.users.get(0).y());
                 conn.users.get(0).setCoord(event.getX(),event.getY());
@@ -104,6 +105,7 @@ public class Controller implements Initializable{
             else gc.setStroke(Color.hsb(h,s,b));
             gc.lineTo(event.getX(), event.getY());
             gc.stroke();
+            if(conn!=null&&!conn.users.isEmpty()) gc.closePath();
             send("DRAW;DRAG;"+event.getX()+";"+event.getY());
         });
 
@@ -343,14 +345,11 @@ public class Controller implements Initializable{
             case "DRAW":
                 if(conn.isHost()||id!=conn.users.get(0).id()) {
                     int user_id=conn.getUserById(id);
-                    if(user_id!=-1){
-                        gc.setStroke(conn.users.get(user_id).color());
-                    }
-                    else{
-                        gc.setStroke(Color.BLACK);
-                    }
+
                     switch (arr[1]) {
                         case "CLICK":
+                            if(conn.users.get(user_id)!=null) gc.setFill(conn.users.get(user_id).color());
+                            else gc.setFill(Color.BLACK);
                             gc.fillOval(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
                             undo.add(canvas.snapshot(null,null));
                             if(undo.size()>1)undoBtn.setDisable(false);
@@ -363,10 +362,14 @@ public class Controller implements Initializable{
                             if (conn.isHost()) send(str,false);
                             break;
                         case "DRAG":
+                            if(conn.users.get(user_id)!=null) gc.setStroke(conn.users.get(user_id).color());
+                            else gc.setStroke(Color.BLACK);
+                            gc.beginPath();
                             gc.moveTo(conn.users.get(user_id).x(), conn.users.get(user_id).y());
                             gc.lineTo(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
                             conn.users.get(user_id).setCoord(Double.parseDouble(arr[2]),Double.parseDouble(arr[3]));
                             gc.stroke();
+                            gc.closePath();
                             if (conn.isHost()) send(str,false);
                             break;
                         case "RELEASE":
