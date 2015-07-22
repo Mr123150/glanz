@@ -308,6 +308,7 @@ public class Controller implements Initializable{
                                     for(User user:conn.users){
                                         send("SYNC;"+ new_id +";USER;"+user.id()+";"+user.addressText()+";"+user.colorText());
                                     }
+                                    send("CHANGE;USER;ADD;"+new_id+";"+arr[2]);
                                 } else {
                                     conn.send("CONNECT;REJECT;" + arr[2], true);
                                 }
@@ -334,7 +335,10 @@ public class Controller implements Initializable{
             case "DISCONNECT":
                 if(conn.isHost()||Integer.parseInt(arr[1])==id||Integer.parseInt(arr[1])==0) {
                     if (conn.isHost()) {
+                        User user=conn.users.get(conn.getUserById(id));
                         conn.users.remove(conn.getUserById(id));
+                        userScroll.remove(new UserNode(user.id(),user.addressText(),true));
+                        send("CHANGE;USER;REMOVE;"+user.id());
                     }
                     else {
                         conn=null;
@@ -362,7 +366,7 @@ public class Controller implements Initializable{
                             if (conn.isHost()) send(str,false);
                             break;
                         case "DRAG":
-                            if(conn.users.get(user_id)!=null) gc.setStroke(conn.users.get(user_id).color());
+                            if(user_id!=-1) gc.setStroke(conn.users.get(user_id).color());
                             else gc.setStroke(Color.BLACK);
                             gc.beginPath();
                             gc.moveTo(conn.users.get(user_id).x(), conn.users.get(user_id).y());
@@ -408,6 +412,27 @@ public class Controller implements Initializable{
                     int user_id=conn.getUserById(id);
                     if(user_id!=-1) {
                         switch (arr[1]) {
+                            case "USER":
+                                switch(arr[2]){
+                                    case "ADD":
+                                        int new_id=Integer.parseInt(arr[3]);
+                                        if(conn.getUserById(new_id)==-1){
+                                            try {
+                                                conn.users.add(new User(new_id, arr[4]));
+                                                userScroll.add(new UserNode(new_id,arr[4],false));
+                                            }
+                                            catch(Exception e){
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                        break;
+                                    case "REMOVE":
+
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                break;
                             case "COLOR":
                                 conn.users.get(user_id).setColor(Double.parseDouble(arr[2]),Double.parseDouble(arr[3]),Double.parseDouble(arr[4]));
                                 if(conn.isHost())send(str,false);
