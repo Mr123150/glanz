@@ -50,8 +50,6 @@ public class Controller implements Initializable{
 
     double h,s,b;
 
-    int users=0;
-
     @Override
     public void initialize(URL url, ResourceBundle rb){
         hc=hcolor.getGraphicsContext2D();
@@ -146,7 +144,6 @@ public class Controller implements Initializable{
         undo.clear();
         undo.add(canvas.snapshot(null,null));
         gc.drawImage(undo.get(0),0,0);
-        //gc.closePath();
     }
 
     public void setHue(double h){
@@ -360,8 +357,6 @@ public class Controller implements Initializable{
                             if (conn.isHost()) send(str,false);
                             break;
                         case "PRESS":
-                            //gc.beginPath();
-                            //gc.moveTo(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
                             conn.users.get(user_id).setCoord(Double.parseDouble(arr[2]),Double.parseDouble(arr[3]));
                             if (conn.isHost()) send(str,false);
                             break;
@@ -377,7 +372,6 @@ public class Controller implements Initializable{
                             if (conn.isHost()) send(str,false);
                             break;
                         case "RELEASE":
-                            //gc.closePath();
                             if (conn.isHost()) send(str,false);
                             break;
                         default:
