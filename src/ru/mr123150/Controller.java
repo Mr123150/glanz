@@ -63,65 +63,19 @@ public class Controller implements Initializable{
         setHue(0);
         setColor(0, 0);
 
-        //gc=canvas.getGraphicsContext2D();
         gc=layerCanvas.context();
         gc.beginPath();
         gc.moveTo(0, 0);
-        /*gc.lineTo(canvas.getWidth(),0);
-        gc.lineTo(canvas.getWidth(), canvas.getHeight());
-        gc.lineTo(0, canvas.getHeight());
-        gc.lineTo(0, 0);*/
         gc.lineTo(layerCanvas.getWidth(),0);
         gc.lineTo(layerCanvas.getWidth(), layerCanvas.getHeight());
         gc.lineTo(0, layerCanvas.getHeight());
         gc.lineTo(0, 0);
-        //gc.closePath();
         gc.stroke();
 
-        //undo.add(canvas.snapshot(null,null));
         undo.add(layerCanvas.snapshot());
         if(undo.size()<=1)undoBtn.setDisable(true);
         if(redo.isEmpty())redoBtn.setDisable(true);
         userScroll.init(this);
-        /*canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-            if (conn != null && !conn.users.isEmpty()) gc.setFill(conn.users.get(0).color());
-            else gc.setFill(Color.hsb(h, s, b));
-            gc.fillOval(event.getX(), event.getY(), gc.getLineWidth(), gc.getLineWidth());
-            send("DRAW;CLICK;" + event.getX() + ";" + event.getY());
-
-            undo.add(canvas.snapshot(null, null));
-            if (undo.size() > 1) undoBtn.setDisable(false);
-        });
-
-        canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
-            if(conn!=null&&!conn.users.isEmpty()) {
-                conn.users.get(0).setCoord(event.getX(),event.getY());
-            }
-            else {
-                gc.beginPath();
-                gc.moveTo(event.getX(), event.getY());
-            }
-            send("DRAW;PRESS;"+event.getX()+";"+event.getY());
-        });
-
-        canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
-            if(conn!=null&&!conn.users.isEmpty()) {
-                gc.beginPath();
-                gc.setStroke(conn.users.get(0).color());
-                gc.moveTo(conn.users.get(0).x(),conn.users.get(0).y());
-                conn.users.get(0).setCoord(event.getX(),event.getY());
-            }
-            else gc.setStroke(Color.hsb(h,s,b));
-            gc.lineTo(event.getX(), event.getY());
-            gc.stroke();
-            if(conn!=null&&!conn.users.isEmpty()) gc.closePath();
-            send("DRAW;DRAG;"+event.getX()+";"+event.getY());
-        });
-
-        canvas.addEventHandler(MouseEvent.MOUSE_RELEASED, event -> {
-            //gc.closePath();
-            send("DRAW;RELEASE");
-        });*/
 
         layerCanvas.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (conn != null && !conn.users.isEmpty()) gc.setFill(conn.users.get(0).color());
@@ -159,7 +113,6 @@ public class Controller implements Initializable{
         });
 
         layerCanvas.addEventHandler(MouseEvent.MOUSE_RELEASED, event -> {
-            //gc.closePath();
             send("DRAW;RELEASE");
         });
 
@@ -181,36 +134,13 @@ public class Controller implements Initializable{
     }
 
     public void resizeCanvas(double width, double height){
-        /*gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        canvas.setWidth(width-leftBox.getWidth()-rightBox.getWidth());
-        canvas.setHeight(height - topBox.getHeight() - bottomBox.getHeight());
-        gc.beginPath();
-        gc.moveTo(0, 0);
-        gc.lineTo(canvas.getWidth(), 0);
-        gc.lineTo(canvas.getWidth(), canvas.getHeight());
-        gc.lineTo(0, canvas.getHeight());
-        gc.lineTo(0, 0);
-        gc.stroke();
-
-        undo.clear();
-        undo.add(canvas.snapshot(null,null));
-        gc.drawImage(undo.get(0),0,0);*/
 
         gc.clearRect(0, 0, layerCanvas.getWidth(), layerCanvas.getHeight());
         layerCanvas.resize(width,height);
-        /*gc.beginPath();
-        gc.moveTo(0, 0);
-        gc.lineTo(canvas.getWidth(), 0);
-        gc.lineTo(canvas.getWidth(), canvas.getHeight());
-        gc.lineTo(0, canvas.getHeight());
-        gc.lineTo(0, 0);
-        gc.stroke();*/
 
         undo.clear();
         undo.add(layerCanvas.snapshot());
         gc.drawImage(undo.get(0),0,0);
-
-        //gc.closePath();
     }
 
     public void setHue(double h){
@@ -252,7 +182,6 @@ public class Controller implements Initializable{
     }
 
     public void undo(boolean send){
-        //gc.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
         gc.clearRect(0,0,layerCanvas.getWidth(),layerCanvas.getHeight());
         redo.add(undo.lastElement());
         undo.remove(undo.size()-1);
@@ -267,7 +196,6 @@ public class Controller implements Initializable{
     }
 
     public void redo(boolean send){
-        //gc.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
         gc.clearRect(0,0,layerCanvas.getWidth(),layerCanvas.getHeight());
         undo.add(redo.lastElement());
         gc.drawImage(redo.lastElement(),0,0);
@@ -368,7 +296,6 @@ public class Controller implements Initializable{
                                     conn.users.add(new User(new_id,arr[2]));
                                     userScroll.add(new UserNode(new_id,arr[2],true));
                                     send("CONNECT;ACCEPT;" + new_id + ";" + arr[2]);
-                                    //send("SYNC;"+ new_id +";SIZE;" + canvas.getWidth() + ";" + canvas.getHeight() + ";" + arr[2]);
                                     send("SYNC;"+ new_id +";SIZE;" + layerCanvas.getWidth() + ";" + layerCanvas.getHeight() + ";" + arr[2]);
                                     send("SYNC;"+ new_id +";LAYERS;1"); //Stub for multi-layers
                                     send("SYNC;"+ new_id +";DATA;0;data"); //Stub for data sync
@@ -422,14 +349,11 @@ public class Controller implements Initializable{
                             if(conn.users.get(user_id)!=null) gc.setFill(conn.users.get(user_id).color());
                             else gc.setFill(Color.BLACK);
                             gc.fillOval(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
-                            //undo.add(canvas.snapshot(null,null));
                             undo.add(layerCanvas.snapshot());
                             if(undo.size()>1)undoBtn.setDisable(false);
                             if (conn.isHost()) send(str,false);
                             break;
                         case "PRESS":
-                            //gc.beginPath();
-                            //gc.moveTo(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
                             conn.users.get(user_id).setCoord(Double.parseDouble(arr[2]),Double.parseDouble(arr[3]));
                             if (conn.isHost()) send(str,false);
                             break;
@@ -445,7 +369,6 @@ public class Controller implements Initializable{
                             if (conn.isHost()) send(str,false);
                             break;
                         case "RELEASE":
-                            //gc.closePath();
                             if (conn.isHost()) send(str,false);
                             break;
                         default:

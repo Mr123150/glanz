@@ -2,6 +2,7 @@ package ru.mr123150.draw;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.WritableImage;
@@ -40,8 +41,41 @@ public class LayerCanvas extends Pane {
     public void resize(double width, double height){
         setWidth(width);
         setHeight(height);
-        activeCanvas.setWidth(width);
-        activeCanvas.setHeight(height);
+        for(Node node:getChildren()) {
+            Canvas canvas=(Canvas)node;
+            canvas.setWidth(width);
+            canvas.setHeight(height);
+        }
+    }
+
+    public void add(){
+        Canvas newCanvas = new Canvas();
+        newCanvas.setWidth(getWidth());
+        newCanvas.setHeight(getHeight());
+        int id=Integer.parseInt(getChildren().get(getChildren().size()-1).getId())+1;
+        newCanvas.setId(id+"");
+        getChildren().add(newCanvas);
+    }
+
+    public void add(String id){
+        Canvas newCanvas = new Canvas();
+        newCanvas.setWidth(getWidth());
+        newCanvas.setHeight(getHeight());
+        newCanvas.setId(id);
+        getChildren().add(newCanvas);
+    }
+
+    public Canvas find(String id){
+        for(Node node:getChildren()){
+            if(node.getId().equals(id))
+                return (Canvas)node;
+        }
+        return null;
+    }
+
+    public void select(String id){
+        Canvas canvas=find(id);
+        if(canvas!=null) activeCanvas=canvas;
     }
 
 
