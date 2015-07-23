@@ -4,6 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import ru.mr123150.gui.ScrollList?>
 <?import javafx.scene.text.Text?>
+<?import ru.mr123150.draw.LayerCanvas?>
 <BorderPane fx:controller="ru.mr123150.Controller" fx:id="rootPane" xmlns:fx="http://javafx.com/fxml">
     <top>
         <HBox fx:id="topBox">
@@ -14,7 +15,8 @@
         </HBox>
     </top>
     <center>
-        <Canvas fx:id="canvas" width="500.0" height="500.0"/>
+        <!--<Canvas fx:id="canvas" width="500.0" height="500.0"/>-->
+        <LayerCanvas fx:id="layerCanvas" prefWidth="500.0" prefHeight="500.0"/>
     </center>
     <left>
         <VBox fx:id="leftBox">
