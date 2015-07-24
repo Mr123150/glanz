@@ -16,8 +16,7 @@ import java.io.IOException;
 public class LayerCanvas extends Pane {
 
     protected GraphicsContext gc;
-    protected Canvas activeCanvas;
-    @FXML protected Canvas tmpCanvas;
+    protected Canvas activeCanvas=null;
 
     public LayerCanvas(){
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("layer_canvas.fxml"));
@@ -30,7 +29,7 @@ public class LayerCanvas extends Pane {
             throw new RuntimeException(exception);
         }
 
-        activeCanvas=tmpCanvas;
+        add("0");
         gc=activeCanvas.getGraphicsContext2D();
     }
 
@@ -48,13 +47,19 @@ public class LayerCanvas extends Pane {
         }
     }
 
+    public void refresh(){
+        gc=activeCanvas.getGraphicsContext2D();
+    }
+
     public void add(){
         Canvas newCanvas = new Canvas();
         newCanvas.setWidth(getWidth());
         newCanvas.setHeight(getHeight());
-        int id=Integer.parseInt(getChildren().get(getChildren().size()-1).getId())+1;
-        newCanvas.setId(id+"");
+        int id = getChildren().isEmpty() ? 0 : (Integer.parseInt(getChildren().get(getChildren().size() - 1).getId()) + 1);
+        newCanvas.setId(id + "");
         getChildren().add(newCanvas);
+        select(id + "");
+        System.out.println("Layer "+id+" added");
     }
 
     public void add(String id){
@@ -63,6 +68,8 @@ public class LayerCanvas extends Pane {
         newCanvas.setHeight(getHeight());
         newCanvas.setId(id);
         getChildren().add(newCanvas);
+        System.out.println("Layer "+id+" added");
+        select(id);
     }
 
     public Canvas find(String id){
@@ -75,7 +82,11 @@ public class LayerCanvas extends Pane {
 
     public void select(String id){
         Canvas canvas=find(id);
-        if(canvas!=null) activeCanvas=canvas;
+        if(canvas!=null) {
+            activeCanvas=canvas;
+            refresh();
+            System.out.println("Layer "+id+" selected");
+        }
     }
 
 

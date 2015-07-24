@@ -63,6 +63,8 @@ public class Controller implements Initializable{
         setHue(0);
         setColor(0, 0);
 
+        layerCanvas.add(); //todo
+
         gc=layerCanvas.context();
         gc.beginPath();
         gc.moveTo(0, 0);
@@ -203,6 +205,16 @@ public class Controller implements Initializable{
         if(redo.isEmpty())redoBtn.setDisable(true);
         if(undo.size()>1)undoBtn.setDisable(false);
         if(send)send("CHANGE;REDO");
+    }
+
+    @FXML public void tmpLayer(){ //todo
+        layerCanvas.select("0");
+        gc=layerCanvas.context();
+    }
+
+    @FXML public void tmpLayer1(){ //todo
+        layerCanvas.select("1");
+        gc=layerCanvas.context();
     }
 
     @FXML public void connect(){

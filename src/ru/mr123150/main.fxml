@@ -12,6 +12,8 @@
             <Button fx:id="hostBtn" onAction="#host" text="Host" />
             <Button fx:id="undoBtn" onAction="#undo" text="Undo" />
             <Button fx:id="redoBtn" onAction="#redo" text="Redo" />
+            <Button onAction="#tmpLayer" text="Layer 0" />
+            <Button onAction="#tmpLayer1" text="Layer 1" />
         </HBox>
     </top>
     <center>
