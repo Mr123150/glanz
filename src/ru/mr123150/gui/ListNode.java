@@ -3,12 +3,12 @@ package ru.mr123150.gui;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import ru.mr123150.Controller;
 
 import java.io.IOException;
 
-public class ListNode extends HBox{
+public class ListNode extends Pane {
 
     @FXML Label idLabel;
     ScrollList parent=null;
@@ -42,6 +42,10 @@ public class ListNode extends HBox{
 
     public int id(){
         return Integer.parseInt(idLabel.getText());
+    }
+
+    public void showId(boolean show){
+        idLabel.setVisible(show);
     }
 
     public void setParent(ScrollList parent){

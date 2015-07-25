@@ -1,7 +1,10 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Button?>
-<fx:root type="ru.mr123150.gui.ListNode" xmlns:fx="http://javafx.com/fxml" prefHeight="30" alignment="CENTER_LEFT">
-    <Label fx:id="idLabel" prefWidth="30" textAlignment="CENTER"/>
-    <Label fx:id="addressLabel"/>
-    <Button fx:id="disconnectBtn" text="Disconnect" onAction="#disconnect" />
+<?import javafx.scene.layout.GridPane?>
+<fx:root type="ru.mr123150.gui.ListNode" xmlns:fx="http://javafx.com/fxml" prefHeight="30">
+    <GridPane fx:id="nodeGrid">
+        <Label fx:id="idLabel" prefWidth="30" textAlignment="CENTER" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <Label fx:id="addressLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+        <Button fx:id="disconnectBtn" text="Disconnect" onAction="#disconnect" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+    </GridPane>
 </fx:root>
