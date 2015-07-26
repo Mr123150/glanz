@@ -13,20 +13,20 @@
 <children>
 
 
-    <MenuBar fx:id="menuBar" styleClass="menu-bar" >
+    <MenuBar fx:id="menuBar" styleClass="menu-bar" useSystemMenuBar="true">
         <menus>
-            <Menu id="menuF" text="File" >
+            <Menu id="menuF" text="File">
                 <items>
-                    <MenuItem text="New"   accelerator="Ctrl+N" />
-                    <MenuItem text="Open"  accelerator="Ctrl+O"/>
-                    <MenuItem text="Save"  accelerator="Ctrl+S"/>
+                    <MenuItem text="New"   accelerator="Shortcut+N" />
+                    <MenuItem text="Open"  accelerator="Shortcut+O"/>
+                    <MenuItem text="Save"  accelerator="Shortcut+S"/>
                     <MenuItem text="Save As"/>
                 </items>
             </Menu>
             <Menu id="menuE" text="Edit" >
                 <items>
-                    <MenuItem fx:id="UndoMI" text="Undo"  onAction="#undo" disable="true" accelerator="Ctrl+Z"/>
-                    <MenuItem fx:id="RedoMI" text="Redo"  onAction="#redo" disable="true" accelerator="Ctrl+A"/>
+                    <MenuItem fx:id="UndoMI" text="Undo"  onAction="#undo" disable="true" accelerator="Shortcut+Z"/>
+                    <MenuItem fx:id="RedoMI" text="Redo"  onAction="#redo" disable="true" accelerator="Shortcut+A"/>
                     <MenuItem fx:id="ResizeMI" text="Resize"/>
                 </items>
             </Menu>
@@ -50,7 +50,7 @@
                 <Button fx:id="hostBtn"  text="Host" />
                 <Label  fx:id="brushSizeLabel" text="Brush Size:"/>
                 <Slider fx:id="brushSizeSlider" prefWidth="150.0" min="0" max="150" onDragDone="#resizeBrush" />
-                <Spinner fx:id="brushSizeSpinner" prefWidth="50.0" />
+                <Spinner fx:id="brushSizeSpinner" prefWidth="70.0" />
             </ToolBar>
         </top>
 
