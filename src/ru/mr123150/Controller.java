@@ -6,14 +6,14 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
+
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
+import javafx.stage.FileChooser;
 import ru.mr123150.conn.Connection;
 import ru.mr123150.conn.User;
 import ru.mr123150.gui.ScrollList;
@@ -22,18 +22,42 @@ import ru.mr123150.gui.UserNode;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.Vector;
+import javafx.scene.image.*;
 
 public class Controller implements Initializable{
     @FXML Canvas canvas;
     @FXML Canvas hcolor;
     @FXML Canvas color;
-    @FXML BorderPane rootPane;
-    @FXML HBox topBox;
-    @FXML VBox leftBox;
     @FXML VBox rightBox;
-    @FXML HBox bottomBox;
-    @FXML Button undoBtn;
-    @FXML Button redoBtn;
+    @FXML MenuBar menuBar;
+    @FXML MenuItem UndoMI;
+    @FXML MenuItem RedoMI;
+
+
+
+
+    @FXML AnchorPane rootPane;
+    @FXML BorderPane borderPane1;
+    @FXML Pane backgroundPane;
+    @FXML Pane canvasPane;
+
+
+
+    @FXML ToolBar toolBar;
+    @FXML Label brushSizeLabel;
+    @FXML Slider brushSizeSlider;
+    @FXML Spinner brushSizeSpinner;
+
+
+    @FXML ToolBar Left_toolBar;
+
+    @FXML Button EraserLTMI;
+    @FXML MenuButton InstrumentLTBtn;
+    @FXML MenuItem BrushLTMI;
+    @FXML MenuItem PencilLTMI;
+
+
+    FileChooser fileChooser;
 
     @FXML ScrollList userScroll;
     GraphicsContext gc;
@@ -49,12 +73,12 @@ public class Controller implements Initializable{
     boolean isServer=false;
 
     double h,s,b;
-
+    double radiusBrush;
     @Override
     public void initialize(URL url, ResourceBundle rb){
         hc=hcolor.getGraphicsContext2D();
         cc=color.getGraphicsContext2D();
-
+        radiusBrush = 1;
         setHue(0);
         setColor(0, 0);
 
@@ -68,18 +92,29 @@ public class Controller implements Initializable{
         //gc.closePath();
         gc.stroke();
 
+        Image im=new Image(this.getClass().getResource("white_icons/Eraser.png").toString());
+        Image im2=new Image(this.getClass().getResource("white_icons/Brush.png").toString());
+        ImageView imv=new ImageView(im);
+        ImageView imv2=new ImageView(im2);
+        imv.setFitHeight(20);
+        imv.setFitWidth(20);
+        imv2.setFitHeight(20);
+        imv2.setFitWidth(20);
+        EraserLTMI.setGraphic(imv);
+        InstrumentLTBtn.setGraphic(imv2);
+
         undo.add(canvas.snapshot(null,null));
-        if(undo.size()<=1)undoBtn.setDisable(true);
-        if(redo.isEmpty())redoBtn.setDisable(true);
+        if(undo.size()<=1)UndoMI.setDisable(true);
+        if(redo.isEmpty())RedoMI.setDisable(true);
         userScroll.init(this);
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (conn != null && !conn.users.isEmpty()) gc.setFill(conn.users.get(0).color());
             else gc.setFill(Color.hsb(h, s, b));
-            gc.fillOval(event.getX(), event.getY(), gc.getLineWidth(), gc.getLineWidth());
+            gc.fillOval(event.getX(), event.getY(), radiusBrush, radiusBrush);
             send("DRAW;CLICK;" + event.getX() + ";" + event.getY());
 
             undo.add(canvas.snapshot(null, null));
-            if (undo.size() > 1) undoBtn.setDisable(false);
+            if (undo.size() > 1) UndoMI.setDisable(false);
         });
 
         canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
@@ -131,8 +166,9 @@ public class Controller implements Initializable{
 
     public void resizeCanvas(double width, double height){
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        canvas.setWidth(width-leftBox.getWidth()-rightBox.getWidth());
-        canvas.setHeight(height - topBox.getHeight() - bottomBox.getHeight());
+        canvas.setWidth(width-Left_toolBar.getWidth()-rightBox.getWidth());
+        canvas.setHeight(height-toolBar.getHeight()-menuBar.getHeight());
+        borderPane1.setLayoutY(menuBar.getHeight());
         gc.beginPath();
         gc.moveTo(0, 0);
         gc.lineTo(canvas.getWidth(), 0);
@@ -144,6 +180,10 @@ public class Controller implements Initializable{
         undo.clear();
         undo.add(canvas.snapshot(null,null));
         gc.drawImage(undo.get(0),0,0);
+    }
+    public void resizeBrush(){
+       radiusBrush=brushSizeSlider.getValue();
+
     }
 
     public void setHue(double h){
@@ -189,8 +229,8 @@ public class Controller implements Initializable{
         redo.add(undo.lastElement());
         undo.remove(undo.size()-1);
         gc.drawImage(undo.lastElement(),0,0);
-        if(undo.size()<=1)undoBtn.setDisable(true);
-        if(!redo.isEmpty())redoBtn.setDisable(false);
+        if(undo.size()<=1)UndoMI.setDisable(true);
+        if(!redo.isEmpty())RedoMI.setDisable(false);
         if(send)send("CHANGE;UNDO");
     }
 
@@ -203,8 +243,8 @@ public class Controller implements Initializable{
         undo.add(redo.lastElement());
         gc.drawImage(redo.lastElement(),0,0);
         redo.remove(redo.size()-1);
-        if(redo.isEmpty())redoBtn.setDisable(true);
-        if(undo.size()>1)undoBtn.setDisable(false);
+        if(redo.isEmpty())RedoMI.setDisable(true);
+        if(undo.size()>1)UndoMI.setDisable(false);
         if(send)send("CHANGE;REDO");
     }
 
@@ -353,7 +393,7 @@ public class Controller implements Initializable{
                             else gc.setFill(Color.BLACK);
                             gc.fillOval(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
                             undo.add(canvas.snapshot(null,null));
-                            if(undo.size()>1)undoBtn.setDisable(false);
+                            if(undo.size()>1)UndoMI.setDisable(false);
                             if (conn.isHost()) send(str,false);
                             break;
                         case "PRESS":

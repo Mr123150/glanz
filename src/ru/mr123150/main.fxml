@@ -1,37 +1,96 @@
+<?import ru.mr123150.gui.ScrollList?>
+<?import javafx.scene.text.Text?>
 <?import javafx.geometry.Insets?>
+<?import java.net.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.canvas.*?>
 <?import javafx.scene.layout.*?>
-<?import ru.mr123150.gui.ScrollList?>
-<?import javafx.scene.text.Text?>
-<BorderPane fx:controller="ru.mr123150.Controller" fx:id="rootPane" xmlns:fx="http://javafx.com/fxml">
-    <top>
-        <HBox fx:id="topBox">
-            <Button fx:id="connectBtn" onAction="#connect" text="Connect"/>
-            <Button fx:id="hostBtn" onAction="#host" text="Host" />
-            <Button fx:id="undoBtn" onAction="#undo" text="Undo" />
-            <Button fx:id="redoBtn" onAction="#redo" text="Redo" />
-        </HBox>
-    </top>
-    <center>
-        <Canvas fx:id="canvas" width="500.0" height="500.0"/>
-    </center>
-    <left>
-        <VBox fx:id="leftBox">
+<?import javafx.scene.image.ImageView?>
 
-        </VBox>
-    </left>
-    <right>
+
+
+<AnchorPane fx:controller="ru.mr123150.Controller" fx:id = "rootPane" xmlns:fx="http://javafx.com/fxml" >
+<children>
+
+
+    <MenuBar fx:id="menuBar" styleClass="menu-bar" >
+        <menus>
+            <Menu id="menuF" text="File" >
+                <items>
+                    <MenuItem text="New"   accelerator="Ctrl+N" />
+                    <MenuItem text="Open"  accelerator="Ctrl+O"/>
+                    <MenuItem text="Save"  accelerator="Ctrl+S"/>
+                    <MenuItem text="Save As"/>
+                </items>
+            </Menu>
+            <Menu id="menuE" text="Edit" >
+                <items>
+                    <MenuItem fx:id="UndoMI" text="Undo"  onAction="#undo" disable="true" accelerator="Ctrl+Z"/>
+                    <MenuItem fx:id="RedoMI" text="Redo"  onAction="#redo" disable="true" accelerator="Ctrl+A"/>
+                    <MenuItem fx:id="ResizeMI" text="Resize"/>
+                </items>
+            </Menu>
+            <Menu id="menuI" text="Instruments">
+                <items>
+                    <MenuItem fx:id="SettingsMI" text="Settings"/>
+                </items>
+            </Menu>
+            <Menu id="menuC" text="Connection"/>
+        </menus>
+    </MenuBar>
+
+
+
+    <BorderPane fx:id="borderPane1" layoutY="50">
+
+
+        <top>
+            <ToolBar fx:id="toolBar" >
+                <Button fx:id="connectBtn"  text="Connect"/>
+                <Button fx:id="hostBtn"  text="Host" />
+                <Label  fx:id="brushSizeLabel" text="Brush Size:"/>
+                <Slider fx:id="brushSizeSlider" prefWidth="150.0" min="0" max="150" onDragDone="#resizeBrush" />
+                <Spinner fx:id="brushSizeSpinner" prefWidth="50.0" />
+            </ToolBar>
+        </top>
+
+
+        <center>
+            <Pane fx:id="backgroundPane" styleClass="backgroundPane">
+                <Pane fx:id="canvasPane">
+                    <Canvas fx:id="canvas" width="100." height="300.0"/>
+                </Pane>
+            </Pane>
+        </center>
+
+
+
+        <right>
         <VBox fx:id="rightBox">
             <Canvas fx:id="hcolor" width="250.0" height="15.0" />
             <Canvas fx:id="color" width="250.0" height="250.0" />
             <Label text="Users" />
             <ScrollList fx:id="userScroll" prefWidth="250" prefHeight="200"/>
+            <Label text="Brush Presets" />
+            <ScrollList fx:id="BrushScroll" prefWidth="250" prefHeight="200"/>
         </VBox>
-    </right>
-    <bottom>
-        <HBox fx:id="bottomBox">
+        </right>
 
-        </HBox>
-    </bottom>
-</BorderPane>
+
+
+
+        <left>
+            <ToolBar fx:id="Left_toolBar" orientation="VERTICAL" >
+                <MenuButton fx:id="InstrumentLTBtn" text="Brush" contentDisplay="LEFT" popupSide="LEFT">
+                    <MenuItem fx:id="BrushLTMI" text="Brush"/>
+                    <MenuItem fx:id="PencilLTMI" text="Pencil"/>
+                </MenuButton>
+                <Button fx:id="EraserLTMI" />
+            </ToolBar>
+        </left>
+    </BorderPane>
+</children>
+<stylesheets>
+    <URL value = "@style1.css"/>
+</stylesheets>
+</AnchorPane>
