@@ -462,6 +462,14 @@ public class Controller implements Initializable{
                     }
                 }
                 break;
+            case "CHAT":
+                if(conn.isHost()||id!=conn.users.get(0).id()) {
+                    TextNode node = new TextNode(0, arr[2], arr[1]);
+                    node.showId(false);
+                    chatScroll.add(node);
+                    if (conn.isHost()) send(str, false);
+                }
+                break;
             default:
                 break;
         }
