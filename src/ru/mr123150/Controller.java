@@ -7,6 +7,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -17,6 +18,7 @@ import javafx.scene.paint.Color;
 import ru.mr123150.conn.Connection;
 import ru.mr123150.conn.User;
 import ru.mr123150.gui.ScrollList;
+import ru.mr123150.gui.TextNode;
 import ru.mr123150.gui.UserNode;
 
 import java.net.URL;
@@ -32,10 +34,16 @@ public class Controller implements Initializable{
     @FXML VBox leftBox;
     @FXML VBox rightBox;
     @FXML HBox bottomBox;
+
     @FXML Button undoBtn;
     @FXML Button redoBtn;
 
     @FXML ScrollList userScroll;
+
+    @FXML ScrollList chatScroll;
+    @FXML TextField chatText;
+    @FXML Button chatSend;
+
     GraphicsContext gc;
     GraphicsContext hc;
     GraphicsContext cc;
@@ -206,6 +214,15 @@ public class Controller implements Initializable{
         if(redo.isEmpty())redoBtn.setDisable(true);
         if(undo.size()>1)undoBtn.setDisable(false);
         if(send)send("CHANGE;REDO");
+    }
+
+    @FXML public void chat(){
+        String msg=chatText.getText();
+        msg=msg.replace(";",":");
+        TextNode node=new TextNode(0,conn.users.get(0).id()+"",msg);
+        node.showId(false);
+        chatScroll.add(node);
+        send("CHAT;" + msg);
     }
 
     @FXML public void connect(){
@@ -443,6 +460,14 @@ public class Controller implements Initializable{
                                 break;
                         }
                     }
+                }
+                break;
+            case "CHAT":
+                if(conn.isHost()||id!=conn.users.get(0).id()) {
+                    TextNode node = new TextNode(0, arr[2], arr[1]);
+                    node.showId(false);
+                    chatScroll.add(node);
+                    if (conn.isHost()) send(str, false);
                 }
                 break;
             default:
