@@ -38,6 +38,9 @@ public class Controller implements Initializable{
     @FXML Button redoBtn;
 
     @FXML ScrollList userScroll;
+
+    @FXML Label statusLabel;
+
     GraphicsContext gc;
     GraphicsContext hc;
     GraphicsContext cc;
@@ -54,6 +57,7 @@ public class Controller implements Initializable{
 
     @Override
     public void initialize(URL url, ResourceBundle rb){
+
         hc=hcolor.getGraphicsContext2D();
         cc=color.getGraphicsContext2D();
 
@@ -83,6 +87,8 @@ public class Controller implements Initializable{
             undo.add(canvas.snapshot(null,null));
             if(undo.size()>1)undoBtn.setDisable(false);
         });
+
+        statusLabel.setText("");
 
         canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
             gc.beginPath();
@@ -124,10 +130,10 @@ public class Controller implements Initializable{
         spinner.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL);
     }
 
-    public void resizeCanvas(double width, double height){
+    public void resizeCanvas(){
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        canvas.setWidth(width-leftBox.getWidth()-rightBox.getWidth());
-        canvas.setHeight(height - topBox.getHeight() - bottomBox.getHeight());
+        canvas.setWidth(rootPane.getWidth()-leftBox.getWidth()-rightBox.getWidth());
+        canvas.setHeight(rootPane.getHeight() - topBox.getHeight() - bottomBox.getHeight());
         gc.beginPath();
         gc.moveTo(0, 0);
         gc.lineTo(canvas.getWidth(), 0);
@@ -243,6 +249,7 @@ public class Controller implements Initializable{
             hconn=new Connection(5050);
             conn=new Connection(5051,true,true);
             System.out.println("//SERVER STARTED");
+            statusLabel.setText("Server started");
             listen();
             conn.users.insertElementAt(new User(), 0);
             conn.users.get(0).setColor(h, s, b);
@@ -338,6 +345,7 @@ public class Controller implements Initializable{
                                 userScroll.add(new UserNode(Integer.parseInt(arr[2]), arr[3], false));
                                 conn.users.get(0).setColor(h, s, b);
                                 if(spinner.isShowing())spinner.hide();
+                                statusLabel.setText("Successfully connected");
                             }
                             catch (Exception e){
                                 e.printStackTrace();
@@ -351,6 +359,7 @@ public class Controller implements Initializable{
                             alert.setTitle("Connection rejected");
                             alert.setContentText("Connection request was rejected by host");
                             alert.show();
+                            statusLabel.setText("Connection failed");
                             break;
                         default:
                             break;

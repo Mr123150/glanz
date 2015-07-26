@@ -17,7 +17,6 @@ public class Main extends Application {
     public void start(Stage stage) throws Exception{
         FXMLLoader loader=new FXMLLoader(getClass().getResource("main.fxml"));
         Parent root = loader.load();
-        Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
 
         Controller controller=loader.getController();
 
@@ -31,9 +30,10 @@ public class Main extends Application {
 
         stage.setMaximized(true);
 
+
         stage.show();
 
-        controller.resizeCanvas(primaryScreenBounds.getWidth(),primaryScreenBounds.getHeight());
+        controller.resizeCanvas();
     }
 
 
