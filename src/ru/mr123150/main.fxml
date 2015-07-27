@@ -26,7 +26,13 @@
             <Canvas fx:id="hcolor" width="250.0" height="15.0" />
             <Canvas fx:id="color" width="250.0" height="250.0" />
             <Label text="Users" />
-            <ScrollList fx:id="userScroll" prefWidth="250" prefHeight="200"/>
+            <ScrollList fx:id="userScroll" prefWidth="250" prefHeight="150"/>
+            <Label text="Chat" />
+            <ScrollList fx:id="chatScroll" prefWidth="250" prefHeight="150"/>
+            <HBox>
+                <TextField fx:id="chatText" prefWidth="200"/>
+                <Button fx:id="chatSend" prefWidth="50" onAction="#chat" text="Send"/>
+            </HBox>
         </VBox>
     </right>
     <bottom>
