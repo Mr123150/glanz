@@ -9,7 +9,8 @@
 
 
 
-<AnchorPane fx:controller="ru.mr123150.Controller" fx:id = "rootPane" xmlns:fx="http://javafx.com/fxml" >
+<AnchorPane fx:controller="ru.mr123150.Controller" fx:id = "rootPane" xmlns:fx="http://javafx.com/fxml" stylesheets="@./style1.css">
+
 <children>
 
 
