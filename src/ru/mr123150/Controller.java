@@ -137,19 +137,43 @@ public class Controller implements Initializable{
         });
 
         hcolor.addEventHandler(MouseEvent.MOUSE_PRESSED, event ->{
-            setHue(event.getX() / hcolor.getWidth() * 360);
+            int h=(int)(event.getX() / hcolor.getWidth() * 360);
+            hColorText.setText(h+"");
+            setHue(h);
         });
 
         hcolor.addEventHandler(MouseEvent.MOUSE_DRAGGED, event ->{
-            setHue(event.getX()/hcolor.getWidth()*360);
+            int h=(int)(event.getX() / hcolor.getWidth() * 360);
+            hColorText.setText(h+"");
+            setHue(h);
         });
 
         color.addEventHandler(MouseEvent.MOUSE_PRESSED, event ->{
-            setColor(event.getX() / color.getWidth(), 1 - event.getY() / color.getHeight());
+            int s=(int)(100*event.getX() / color.getWidth());
+            int b=(int)(100*(1 - event.getY() / color.getHeight()));
+            sColorText.setText(s+"");
+            bColorText.setText(b+"");
+            setColor((double)s/100,(double)b/100);
         });
 
         color.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
-            setColor(event.getX() / color.getWidth(), 1 - event.getY() / color.getHeight());
+            int s=(int)(100*event.getX() / color.getWidth());
+            int b=(int)(100*(1 - event.getY() / color.getHeight()));
+            sColorText.setText(s+"");
+            bColorText.setText(b+"");
+            setColor((double)s/100,(double)b/100);
+        });
+
+        hColorText.textProperty().addListener((observable,oldValue,newValue)->{
+            parseColor();
+        });
+
+        sColorText.textProperty().addListener((observable,oldValue,newValue)->{
+            parseColor();
+        });
+
+        bColorText.textProperty().addListener((observable,oldValue,newValue)->{
+            parseColor();
         });
 
         spinner.setTitle("Please wait");
@@ -208,12 +232,33 @@ public class Controller implements Initializable{
         cc.strokeOval(s * color.getWidth() - hcolor.getHeight() / 2, (1 - b) * color.getHeight() - hcolor.getHeight() / 2, hcolor.getHeight(), hcolor.getHeight());
     }
 
+    public void parseColor(){
+        int h,s,b;
+        try{h=Integer.parseInt(hColorText.getText());}
+        catch (Exception e){h=0;}
+        try{s=Integer.parseInt(sColorText.getText());}
+        catch (Exception e){s=0;}
+        try{b=Integer.parseInt(bColorText.getText());}
+        catch (Exception e){b=0;}
+        if(h>360)h=360;
+        if(h<0)h=0;
+        if(s>100)h=100;
+        if(s<0)h=0;
+        if(b>100)h=100;
+        if(b<0)h=0;
+        setHue(h);
+        setColor((double)s/100,(double)b/100);
+        curC.setFill(Color.hsb(h,(double)s/100,(double)b/100));
+        curC.fillRect(0,0,curColor.getWidth(),curColor.getHeight());
+
+    }
+
     @FXML public void undo(){
         undo(true);
     }
 
     public void undo(boolean send){
-        gc.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         redo.add(undo.lastElement());
         undo.remove(undo.size()-1);
         gc.drawImage(undo.lastElement(),0,0);
@@ -227,7 +272,7 @@ public class Controller implements Initializable{
     }
 
     public void redo(boolean send){
-        gc.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         undo.add(redo.lastElement());
         gc.drawImage(redo.lastElement(),0,0);
         redo.remove(redo.size()-1);
@@ -411,7 +456,7 @@ public class Controller implements Initializable{
                         User user=conn.users.get(conn.getUserById(id));
                         conn.users.remove(conn.getUserById(id));
                         userScroll.remove(new UserNode(user.id(),user.addressText(),true));
-                        send("CHANGE;USER;REMOVE;"+user.id());
+                        send("CHANGE;USER;REMOVE;" + user.id());
                     }
                     else {
                         conn=null;

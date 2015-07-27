@@ -31,9 +31,9 @@
                     <Label text="H: " GridPane.rowIndex="0" GridPane.columnIndex="0"/>
                     <Label text="S: " GridPane.rowIndex="1" GridPane.columnIndex="0"/>
                     <Label text="B: " GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                    <TextField fx:id="hColorText" prefWidth="50" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-                    <TextField fx:id="sColorText" prefWidth="50" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-                    <TextField fx:id="bColorText" prefWidth="50" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                    <TextField fx:id="hColorText" prefWidth="50" GridPane.rowIndex="0" GridPane.columnIndex="1" text="0" onAction="#parseColor"/>
+                    <TextField fx:id="sColorText" prefWidth="50" GridPane.rowIndex="1" GridPane.columnIndex="1" text="0" onAction="#parseColor"/>
+                    <TextField fx:id="bColorText" prefWidth="50" GridPane.rowIndex="2" GridPane.columnIndex="1" text="0" onAction="#parseColor"/>
                 </GridPane>
             </HBox>
             <Label text="Users" />
