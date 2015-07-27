@@ -30,6 +30,8 @@ public class Controller implements Initializable{
     @FXML Canvas canvas;
     @FXML Canvas hcolor;
     @FXML Canvas color;
+    @FXML Canvas curColor;
+
     @FXML BorderPane rootPane;
     @FXML HBox topBox;
     @FXML VBox leftBox;
@@ -38,6 +40,10 @@ public class Controller implements Initializable{
 
     @FXML Button undoBtn;
     @FXML Button redoBtn;
+
+    @FXML TextField hColorText;
+    @FXML TextField sColorText;
+    @FXML TextField bColorText;
 
     @FXML ScrollList userScroll;
 
@@ -50,6 +56,7 @@ public class Controller implements Initializable{
     GraphicsContext gc;
     GraphicsContext hc;
     GraphicsContext cc;
+    GraphicsContext curC;
 
     Connection conn=null;
     Connection hconn=null;
@@ -66,6 +73,9 @@ public class Controller implements Initializable{
 
         hc=hcolor.getGraphicsContext2D();
         cc=color.getGraphicsContext2D();
+
+        curC=curColor.getGraphicsContext2D();
+        curC.fillRect(0,0,curColor.getWidth(),curColor.getHeight());
 
         setHue(0);
         setColor(0, 0);

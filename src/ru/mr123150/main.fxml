@@ -25,6 +25,17 @@
         <VBox fx:id="rightBox">
             <Canvas fx:id="hcolor" width="250.0" height="15.0" />
             <Canvas fx:id="color" width="250.0" height="250.0" />
+            <HBox spacing="5">
+                <Canvas fx:id="curColor" width="80" height="80" />
+                <GridPane>
+                    <Label text="H: " GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <Label text="S: " GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                    <Label text="B: " GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                    <TextField fx:id="hColorText" prefWidth="50" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                    <TextField fx:id="sColorText" prefWidth="50" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                    <TextField fx:id="bColorText" prefWidth="50" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                </GridPane>
+            </HBox>
             <Label text="Users" />
             <ScrollList fx:id="userScroll" prefWidth="250" prefHeight="150"/>
             <Label text="Chat" />
