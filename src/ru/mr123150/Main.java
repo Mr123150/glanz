@@ -20,9 +20,6 @@ public class Main extends Application {
 
         Controller controller=loader.getController();
 
-        double width=primaryScreenBounds.getWidth();
-        double height=primaryScreenBounds.getHeight();
-
         Scene scene=new Scene(root, 1024, 768);
         stage.setTitle("Canvas");
         stage.setScene(scene);
@@ -32,19 +29,10 @@ public class Main extends Application {
         });
 
         stage.setMaximized(true);
-<<<<<<< HEAD
-        stage.show();
-
-        controller.resizeCanvas(stage.getWidth(),stage.getHeight());
-=======
-
-
         stage.show();
 
         controller.resizeCanvas();
->>>>>>> viktor-window
     }
-
 
     public static void main(String[] args) {
         launch(args);
