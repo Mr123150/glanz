@@ -6,10 +6,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -20,6 +21,7 @@ import ru.mr123150.gui.ScrollList;
 import ru.mr123150.gui.UserNode;
 
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Vector;
 
@@ -36,6 +38,9 @@ public class Controller implements Initializable{
     @FXML Button redoBtn;
 
     @FXML ScrollList userScroll;
+
+    @FXML Label statusLabel;
+
     GraphicsContext gc;
     GraphicsContext hc;
     GraphicsContext cc;
@@ -43,15 +48,16 @@ public class Controller implements Initializable{
     Connection conn=null;
     Connection hconn=null;
 
-    Vector<WritableImage> undo=new Vector<>();
-    Vector<WritableImage> redo=new Vector<>();
-
-    boolean isServer=false;
+    Vector<WritableImage> undo=new Vector<WritableImage>();
+    Vector<WritableImage> redo=new Vector<WritableImage>();
 
     double h,s,b;
 
+    Dialog<ButtonType> spinner = new Dialog<>();
+
     @Override
     public void initialize(URL url, ResourceBundle rb){
+
         hc=hcolor.getGraphicsContext2D();
         cc=color.getGraphicsContext2D();
 
@@ -81,6 +87,8 @@ public class Controller implements Initializable{
             undo.add(canvas.snapshot(null, null));
             if (undo.size() > 1) undoBtn.setDisable(false);
         });
+
+        statusLabel.setText("");
 
         canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
             if(conn!=null&&!conn.users.isEmpty()) {
@@ -127,12 +135,16 @@ public class Controller implements Initializable{
         color.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
             setColor(event.getX() / color.getWidth(), 1 - event.getY() / color.getHeight());
         });
+
+        spinner.setTitle("Please wait");
+        spinner.setContentText("Waiting for host response");
+        spinner.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL);
     }
 
-    public void resizeCanvas(double width, double height){
+    public void resizeCanvas(){
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        canvas.setWidth(width-leftBox.getWidth()-rightBox.getWidth());
-        canvas.setHeight(height - topBox.getHeight() - bottomBox.getHeight());
+        canvas.setWidth(rootPane.getWidth()-leftBox.getWidth()-rightBox.getWidth());
+        canvas.setHeight(rootPane.getHeight() - topBox.getHeight() - bottomBox.getHeight());
         gc.beginPath();
         gc.moveTo(0, 0);
         gc.lineTo(canvas.getWidth(), 0);
@@ -209,16 +221,37 @@ public class Controller implements Initializable{
     }
 
     @FXML public void connect(){
-        try{
-            conn=new Connection("192.168.0.110",5050);
-            hconn=new Connection(5051,false);
-            listen();
-            send("CONNECT;REQUEST;" + conn.getAddress());
-            isServer=false;
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
+        Dialog<Vector<String>> connectDialog = new Dialog<>();
+        connectDialog.setTitle("Connect to remote host");
+        ButtonType connectBtnType=new ButtonType("Connect", ButtonBar.ButtonData.OK_DONE);
+        connectDialog.getDialogPane().getButtonTypes().addAll(connectBtnType, ButtonType.CANCEL);
+        GridPane grid=new GridPane();
+        grid.add(new Label("Host address"),0,0);
+        TextField connAddress = new TextField();
+        grid.add(connAddress,1,0);
+        connectDialog.getDialogPane().setContent(grid);
+        connectDialog.setResultConverter(dialogButton -> {
+            if (dialogButton == connectBtnType) {
+                Vector<String> res=new Vector<String>();
+                res.add(connAddress.getText());
+                return res;
+            }
+            return null;
+        });
+        Optional<Vector<String>> result = connectDialog.showAndWait();
+        result.ifPresent(data->{
+            try{
+                conn=new Connection(data.get(0),5050);
+                hconn=new Connection(5051,false);
+                listen();
+                send("CONNECT;REQUEST;" + conn.getAddress());
+                spinner.show();
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+        });
+
     }
 
     @FXML public void host(){
@@ -226,8 +259,8 @@ public class Controller implements Initializable{
             hconn=new Connection(5050);
             conn=new Connection(5051,true,true);
             System.out.println("//SERVER STARTED");
+            statusLabel.setText("Server started");
             listen();
-            isServer=true;
             conn.users.insertElementAt(new User(), 0);
             conn.users.get(0).setColor(h, s, b);
         }
@@ -292,11 +325,15 @@ public class Controller implements Initializable{
                 if(conn.isHost()||arr[arr.length-2].equals(conn.getAddress())){
                     switch(arr[1]) {
                         case "REQUEST":
-                            int new_id=conn.users.lastElement().id()+1;
                             try {
-                                conn.send("CONNECT;TEST", true);
-                                if (true) {
-                                    conn.users.add(new User(new_id,arr[2]));
+                                int new_id=conn.users.lastElement().id()+1;
+                                conn.users.add(new User(new_id,arr[2]));
+                                Alert alert=new Alert(Alert.AlertType.CONFIRMATION);
+                                alert.setTitle("Connection request");
+                                alert.setContentText("Connection request from IP " + arr[2] + ". Allow?");
+                                send("CONNECT;TEST");
+                                Optional<ButtonType> result=alert.showAndWait();
+                                if (result.get() == ButtonType.OK){
                                     userScroll.add(new UserNode(new_id,arr[2],true));
                                     send("CONNECT;ACCEPT;" + new_id + ";" + arr[2]);
                                     send("SYNC;"+ new_id +";SIZE;" + canvas.getWidth() + ";" + canvas.getHeight() + ";" + arr[2]);
@@ -307,7 +344,8 @@ public class Controller implements Initializable{
                                     }
                                     send("CHANGE;USER;ADD;"+new_id+";"+arr[2]);
                                 } else {
-                                    conn.send("CONNECT;REJECT;" + arr[2], true);
+                                    send("CONNECT;REJECT;" + arr[2]);
+                                    conn.users.remove(conn.users.size()-1);
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -320,10 +358,23 @@ public class Controller implements Initializable{
                                 userScroll.add(new UserNode(0,conn.getAddress(),false));
                                 userScroll.add(new UserNode(Integer.parseInt(arr[2]),arr[3],false));
                                 conn.users.get(0).setColor(h, s, b);
+                                if(spinner.isShowing())spinner.hide();
+                                statusLabel.setText("Successfully connected");
                             }
                             catch (Exception e){
                                 e.printStackTrace();
                             }
+                            break;
+                        case "REJECT":
+                            if(spinner.isShowing())spinner.hide();
+                            conn=null;
+                            hconn=null;
+                            Alert alert=new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle("Connection rejected");
+                            alert.setContentText("Connection request was rejected by host");
+                            alert.show();
+                            statusLabel.setText("Connection failed");
+                            break;
                         default:
                             break;
                     }

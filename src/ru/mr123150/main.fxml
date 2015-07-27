@@ -30,8 +30,8 @@
         </VBox>
     </right>
     <bottom>
-        <HBox fx:id="bottomBox">
-
+        <HBox fx:id="bottomBox" alignment="TOP_LEFT">
+            <Label fx:id="statusLabel" text="Loading app"/>
         </HBox>
     </bottom>
 </BorderPane>

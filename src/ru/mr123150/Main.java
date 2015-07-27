@@ -17,7 +17,6 @@ public class Main extends Application {
     public void start(Stage stage) throws Exception{
         FXMLLoader loader=new FXMLLoader(getClass().getResource("main.fxml"));
         Parent root = loader.load();
-        Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
 
         Controller controller=loader.getController();
 
@@ -33,9 +32,17 @@ public class Main extends Application {
         });
 
         stage.setMaximized(true);
+<<<<<<< HEAD
         stage.show();
 
         controller.resizeCanvas(stage.getWidth(),stage.getHeight());
+=======
+
+
+        stage.show();
+
+        controller.resizeCanvas();
+>>>>>>> viktor-window
     }
 
 
