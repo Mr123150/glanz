@@ -67,6 +67,8 @@ public class Controller implements Initializable{
 
     double h,s,b;
 
+    User user;
+
     Dialog<ButtonType> spinner = new Dialog<>();
 
     @Override
@@ -78,9 +80,6 @@ public class Controller implements Initializable{
         curC=curColor.getGraphicsContext2D();
         curC.fillRect(0,0,curColor.getWidth(),curColor.getHeight());
 
-        setHue(0);
-        setColor(0, 0);
-
         gc=canvas.getGraphicsContext2D();
         gc.beginPath();
         gc.moveTo(0, 0);
@@ -88,19 +87,24 @@ public class Controller implements Initializable{
         gc.lineTo(canvas.getWidth(), canvas.getHeight());
         gc.lineTo(0, canvas.getHeight());
         gc.lineTo(0, 0);
-        //gc.closePath();
         gc.stroke();
+
+        try {
+            user = new User(gc);
+            user.setTool(new Brush());
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+        setHue(0);
+        setColor(0, 0);
 
         undo.add(canvas.snapshot(null,null));
         if(undo.size()<=1)undoBtn.setDisable(true);
         if(redo.isEmpty())redoBtn.setDisable(true);
         userScroll.init(this);
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-            if (conn != null && !conn.users.isEmpty()) conn.users.get(0).dot(event.getX(),event.getY());
-            else {
-                gc.setFill(Color.hsb(h, s, b));
-                gc.fillOval(event.getX(), event.getY(), gc.getLineWidth(), gc.getLineWidth());
-            }
             send("DRAW;CLICK;" + event.getX() + ";" + event.getY());
 
             undo.add(canvas.snapshot(null, null));
@@ -110,31 +114,16 @@ public class Controller implements Initializable{
         statusLabel.setText("");
 
         canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
-            if(conn!=null&&!conn.users.isEmpty()) {
-                conn.users.get(0).setCoord(event.getX(),event.getY());
-            }
-            else {
-                gc.beginPath();
-                gc.moveTo(event.getX(), event.getY());
-            }
+                me().setCoord(event.getX(),event.getY());
             send("DRAW;PRESS;"+event.getX()+";"+event.getY());
         });
 
         canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
-            if(conn!=null&&!conn.users.isEmpty()) {
-                conn.users.get(0).lineTo(event.getX(),event.getY());
-            }
-            else {
-                gc.setStroke(Color.hsb(h, s, b));
-                gc.lineTo(event.getX(), event.getY());
-                gc.stroke();
-            }
-            //if(conn!=null&&!conn.users.isEmpty()) gc.closePath();
+                me().lineTo(event.getX(),event.getY());
             send("DRAW;DRAG;"+event.getX()+";"+event.getY());
         });
 
         canvas.addEventHandler(MouseEvent.MOUSE_RELEASED, event -> {
-            //gc.closePath();
             send("DRAW;RELEASE");
         });
 
@@ -183,6 +172,10 @@ public class Controller implements Initializable{
         spinner.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL);
     }
 
+    public User me(){
+        return conn==null?user:conn.users.get(0);
+    }
+
     public void resizeCanvas(){
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         canvas.setWidth(rootPane.getWidth()-leftBox.getWidth()-rightBox.getWidth());
@@ -219,10 +212,8 @@ public class Controller implements Initializable{
     }
 
     public void redrawColor(){
-        if(conn!=null) {
-            conn.users.get(0).setColor(h, s, b);
+            me().setColor(h, s, b);
             send("CHANGE;COLOR;"+h+";"+s+";"+b);
-        }
         cc.clearRect(0,0,color.getWidth(),color.getHeight());
         for(int i=0;i<color.getWidth();++i){
             for(int j=0;j<color.getHeight();++j){
@@ -286,7 +277,7 @@ public class Controller implements Initializable{
     @FXML public void chat(){
         String msg=chatText.getText();
         msg=msg.replace(";",":");
-        TextNode node=new TextNode(0,conn.users.get(0).id()+"",msg);
+        TextNode node=new TextNode(0,me().id()+"",msg);
         node.showId(false);
         chatScroll.add(node);
         send("CHAT;" + msg);
@@ -334,8 +325,8 @@ public class Controller implements Initializable{
             statusLabel.setText("Server started");
             listen();
             conn.users.insertElementAt(new User(gc), 0);
-            conn.users.get(0).setColor(h, s, b);
-            conn.users.get(0).setTool(new Brush());
+            me().setColor(h, s, b);
+            me().setTool(new Brush());
         }
 
         catch (Exception e){
@@ -430,8 +421,8 @@ public class Controller implements Initializable{
                                 conn.users.insertElementAt(new User(gc), 1);
                                 userScroll.add(new UserNode(0, conn.getAddress(), false));
                                 userScroll.add(new UserNode(Integer.parseInt(arr[2]), arr[3], false));
-                                conn.users.get(0).setColor(h, s, b);
-                                conn.users.get(0).setTool(new Brush());
+                                me().setColor(h, s, b);
+                                me().setTool(new Brush());
                                 if(spinner.isShowing())spinner.hide();
                                 statusLabel.setText("Successfully connected");
                             }
@@ -469,7 +460,7 @@ public class Controller implements Initializable{
                     break;
                 }
             case "DRAW":
-                if(conn.isHost()||id!=conn.users.get(0).id()) {
+                if(conn.isHost()||id!=me().id()) {
                     int user_id=conn.getUserById(id);
 
                     switch (arr[1]) {
@@ -505,12 +496,12 @@ public class Controller implements Initializable{
                 }
                 break;
             case "SYNC":
-                if(Integer.parseInt(arr[1])==conn.users.get(0).id()){
+                if(Integer.parseInt(arr[1])==me().id()){
                     switch(arr[2]){
                         case "USER":
                             try {
                                 int sync_id=Integer.parseInt(arr[3]);
-                                if(sync_id!=conn.users.get(0).id()&&sync_id!=0) {
+                                if(sync_id!=me().id()&&sync_id!=0) {
                                     User new_user = new User(sync_id, arr[4]);
                                     new_user.setColor(Double.parseDouble(arr[5]), Double.parseDouble(arr[6]), Double.parseDouble(arr[7]));
                                     conn.users.add(new_user);
@@ -527,7 +518,7 @@ public class Controller implements Initializable{
                 }
                 break;
             case "CHANGE":
-                if(conn.isHost()||id!=conn.users.get(0).id()) {
+                if(conn.isHost()||id!=me().id()) {
                     int user_id=conn.getUserById(id);
                     if(user_id!=-1) {
                         switch (arr[1]) {
@@ -571,7 +562,7 @@ public class Controller implements Initializable{
                 }
                 break;
             case "CHAT":
-                if(conn.isHost()||id!=conn.users.get(0).id()) {
+                if(conn.isHost()||id!=me().id()) {
                     TextNode node = new TextNode(0, arr[2], arr[1]);
                     node.showId(false);
                     chatScroll.add(node);
@@ -584,6 +575,6 @@ public class Controller implements Initializable{
     }
 
     public void disconnect(){
-        if(conn!=null&&conn.users.get(0).id()!=-1)send("DISCONNECT");
+        if(conn!=null&&me().id()!=-1)send("DISCONNECT");
     }
 }
