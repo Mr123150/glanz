@@ -1,0 +1,23 @@
+<component name="ArtifactManager">
+  <artifact type="javafx" name="Canvas beta">
+    <output-path>$PROJECT_DIR$/out/artifacts/Canvas_beta</output-path>
+    <properties id="javafx-properties">
+      <options>
+        <option name="appClass" value="ru.mr123150.Main" />
+        <option name="description" value="" />
+        <option name="height" value="768" />
+        <option name="htmlParamFile" value="" />
+        <option name="nativeBundle" value="all" />
+        <option name="paramFile" value="" />
+        <option name="title" value="Canvas beta" />
+        <option name="vendor" value="" />
+        <option name="width" value="1024" />
+      </options>
+    </properties>
+    <root id="root">
+      <element id="archive" name="Canvas beta.jar">
+        <element id="module-output" name="canvas-beta" />
+      </element>
+    </root>
+  </artifact>
+</component>

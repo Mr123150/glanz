@@ -20,6 +20,7 @@ import ru.mr123150.conn.User;
 import ru.mr123150.gui.ScrollList;
 import ru.mr123150.gui.TextNode;
 import ru.mr123150.gui.UserNode;
+import ru.mr123150.tool.Brush;
 
 import java.net.URL;
 import java.util.Optional;
@@ -125,8 +126,11 @@ public class Controller implements Initializable{
                 conn.users.get(0).setCoord(event.getX(),event.getY());
             }
             else gc.setStroke(Color.hsb(h,s,b));
-            gc.lineTo(event.getX(), event.getY());
-            gc.stroke();
+            //gc.lineTo(event.getX(), event.getY());
+            //gc.stroke();
+            Brush brush=new Brush();
+            brush.setContext(gc);
+            brush.lineTo(event.getX(),event.getY());
             if(conn!=null&&!conn.users.isEmpty()) gc.closePath();
             send("DRAW;DRAG;"+event.getX()+";"+event.getY());
         });
@@ -423,10 +427,10 @@ public class Controller implements Initializable{
                             break;
                         case "ACCEPT":
                             try {
-                                conn.users.insertElementAt(new User(Integer.parseInt(arr[2])),0);
+                                conn.users.insertElementAt(new User(Integer.parseInt(arr[2])), 0);
                                 conn.users.insertElementAt(new User(), 1);
-                                userScroll.add(new UserNode(0,conn.getAddress(),false));
-                                userScroll.add(new UserNode(Integer.parseInt(arr[2]),arr[3],false));
+                                userScroll.add(new UserNode(0, conn.getAddress(), false));
+                                userScroll.add(new UserNode(Integer.parseInt(arr[2]), arr[3], false));
                                 conn.users.get(0).setColor(h, s, b);
                                 if(spinner.isShowing())spinner.hide();
                                 statusLabel.setText("Successfully connected");
