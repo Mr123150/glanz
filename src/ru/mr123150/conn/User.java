@@ -32,14 +32,32 @@ public class User {
         this.address=InetAddress.getLocalHost();
     }
 
+    public User(GraphicsContext gc) throws IOException{
+        this.id=0;
+        this.address=InetAddress.getLocalHost();
+        this.gc=gc;
+    }
+
     public User(int id) throws IOException{
         this.id=id;
         this.address=InetAddress.getLocalHost();
     }
 
+    public User(int id, GraphicsContext gc) throws IOException{
+        this.id=id;
+        this.address=InetAddress.getLocalHost();
+        this.gc=gc;
+    }
+
     public User(int id,String address) throws IOException{
         this.id=id;
         this.address=InetAddress.getByName(address);
+    }
+
+    public User(int id,String address, GraphicsContext gc) throws IOException{
+        this.id=id;
+        this.address=InetAddress.getByName(address);
+        this.gc=gc;
     }
 
     public void setContext(GraphicsContext gc){this.gc=gc;}
