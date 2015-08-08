@@ -114,7 +114,7 @@ public class Controller implements Initializable{
         statusLabel.setText("");
 
         canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
-                me().setCoord(event.getX(),event.getY());
+                me().setCoord(event.getX(), event.getY());
             send("DRAW;PRESS;"+event.getX()+";"+event.getY());
         });
 
@@ -404,7 +404,7 @@ public class Controller implements Initializable{
                                     send("SYNC;"+ new_id +";LAYERS;1"); //Stub for multi-layers
                                     send("SYNC;"+ new_id +";DATA;0;data"); //Stub for data sync
                                     for(User user:conn.users){
-                                        send("SYNC;"+ new_id +";USER;"+user.id()+";"+user.addressText()+";"+user.colorText());
+                                        send("SYNC;"+ new_id +";USER;"+user.id()+";"+user.addressText()+";"+user.tool()+";"+user.colorText()+";"+user.x()+";"+user.y());
                                     }
                                     send("CHANGE;USER;ADD;"+new_id+";"+arr[2]);
                                 } else {
@@ -503,7 +503,19 @@ public class Controller implements Initializable{
                                 int sync_id=Integer.parseInt(arr[3]);
                                 if(sync_id!=me().id()&&sync_id!=0) {
                                     User new_user = new User(sync_id, arr[4]);
-                                    new_user.setColor(Double.parseDouble(arr[5]), Double.parseDouble(arr[6]), Double.parseDouble(arr[7]));
+                                    new_user.setContext(gc);
+                                    new_user.setColor(Double.parseDouble(arr[6]), Double.parseDouble(arr[7]), Double.parseDouble(arr[8]));
+                                    new_user.setCoord(Double.parseDouble(arr[9]),Double.parseDouble(arr[10]));
+                                    switch (arr[5]){
+                                        case "BRUSH":
+                                            new_user.setTool(new Brush());
+                                            break;
+                                        case "ERASER":
+
+                                            break;
+                                        default:
+                                            break;
+                                    }
                                     conn.users.add(new_user);
                                     userScroll.add(new UserNode(Integer.parseInt(arr[3]), arr[4], false));
                                 }
