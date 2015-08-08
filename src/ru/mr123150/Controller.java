@@ -42,6 +42,8 @@ public class Controller implements Initializable{
     @FXML Button undoBtn;
     @FXML Button redoBtn;
 
+    @FXML TextField brushSizeText;
+
     @FXML TextField hColorText;
     @FXML TextField sColorText;
     @FXML TextField bColorText;
@@ -114,12 +116,12 @@ public class Controller implements Initializable{
         statusLabel.setText("");
 
         canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
-                me().setCoord(event.getX(), event.getY());
+            me().setCoord(event.getX(), event.getY());
             send("DRAW;PRESS;"+event.getX()+";"+event.getY());
         });
 
         canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
-                me().lineTo(event.getX(),event.getY());
+            me().lineTo(event.getX(),event.getY());
             send("DRAW;DRAG;"+event.getX()+";"+event.getY());
         });
 
@@ -212,8 +214,8 @@ public class Controller implements Initializable{
     }
 
     public void redrawColor(){
-            me().setColor(h, s, b);
-            send("CHANGE;COLOR;"+h+";"+s+";"+b);
+        me().setColor(h, s, b);
+        send("CHANGE;COLOR;"+h+";"+s+";"+b);
         cc.clearRect(0,0,color.getWidth(),color.getHeight());
         for(int i=0;i<color.getWidth();++i){
             for(int j=0;j<color.getHeight();++j){

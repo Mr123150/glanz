@@ -11,6 +11,7 @@
             <Button fx:id="hostBtn" onAction="#host" text="Host" />
             <Button fx:id="undoBtn" onAction="#undo" text="Undo" />
             <Button fx:id="redoBtn" onAction="#redo" text="Redo" />
+            <TextField fx:id="brushSizeText" prefWidth="50" text=""/>
         </HBox>
     </top>
     <center>
