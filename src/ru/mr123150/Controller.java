@@ -329,7 +329,7 @@ public class Controller implements Initializable{
             hconn=new Connection(5050);
             conn=new Connection(5051,true,true);
             System.out.println("//SERVER STARTED");
-            statusLabel.setText("Server started");
+            statusLabel.setText("Server started at "+conn.getAddress());
             listen();
             conn.users.insertElementAt(new User(), 0);
             conn.users.get(0).setColor(h, s, b);
