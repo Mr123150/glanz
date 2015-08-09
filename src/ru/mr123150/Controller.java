@@ -107,6 +107,7 @@ public class Controller implements Initializable{
         if(redo.isEmpty())redoBtn.setDisable(true);
         userScroll.init(this);
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            me().dot(event.getX(),event.getY());
             send("DRAW;CLICK;" + event.getX() + ";" + event.getY());
 
             undo.add(canvas.snapshot(null, null));
@@ -481,9 +482,7 @@ public class Controller implements Initializable{
 
                     switch (arr[1]) {
                         case "CLICK":
-                            if(conn.users.get(user_id)!=null) gc.setFill(conn.users.get(user_id).color());
-                            else gc.setFill(Color.BLACK);
-                            gc.fillOval(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
+                            conn.users.get(user_id).dot(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
                             undo.add(canvas.snapshot(null,null));
                             if(undo.size()>1)undoBtn.setDisable(false);
                             if (conn.isHost()) send(str,false);
@@ -493,14 +492,7 @@ public class Controller implements Initializable{
                             if (conn.isHost()) send(str,false);
                             break;
                         case "DRAG":
-                            if(user_id!=-1) gc.setStroke(conn.users.get(user_id).color());
-                            else gc.setStroke(Color.BLACK);
-                            gc.beginPath();
-                            gc.moveTo(conn.users.get(user_id).x(), conn.users.get(user_id).y());
-                            gc.lineTo(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
-                            conn.users.get(user_id).setCoord(Double.parseDouble(arr[2]),Double.parseDouble(arr[3]));
-                            gc.stroke();
-                            gc.closePath();
+                            conn.users.get(user_id).lineTo(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
                             if (conn.isHost()) send(str,false);
                             break;
                         case "RELEASE":

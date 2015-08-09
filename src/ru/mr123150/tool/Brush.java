@@ -16,6 +16,6 @@ public class Brush extends Tool {
     }
 
     public void dot(double x, double y){
-        gc.fillOval(x-gc.getLineWidth(),y-gc.getLineWidth(),2*gc.getLineWidth(),2*gc.getLineWidth());
+        gc.fillOval(x-gc.getLineWidth()/2,y-gc.getLineWidth()/2,gc.getLineWidth(),gc.getLineWidth());
     }
 }

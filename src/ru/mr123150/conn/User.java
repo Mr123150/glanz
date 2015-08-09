@@ -16,16 +16,18 @@ public class User {
     protected int id;
     protected InetAddress address;
 
-    protected double h;
-    protected double s;
-    protected double b;
+    protected double h=0;
+    protected double s=0;
+    protected double b=0;
 
-    protected double x;
-    protected double y;
+    protected double size=1;
 
-    protected GraphicsContext gc;
+    protected double x=0;
+    protected double y=0;
 
-    protected Tool tool;
+    protected GraphicsContext gc=null;
+
+    protected Tool tool=null;
 
     public User() throws IOException{
         this.id=0;
@@ -70,25 +72,25 @@ public class User {
 
     public String addressText(){return address.getHostAddress();}
 
-    public void setId(int id){
-        this.id=id;
-    }
+    public void setId(int id){this.id=id;}
 
-    public Color color(){
-        return Color.hsb(h,s,b);
-    }
+    public Color color(){return Color.hsb(h,s,b);}
 
     public String colorText(){return h+";"+s+";"+b;}
-
-    public double x(){return x;}
-
-    public double y(){return y;}
 
     public void setColor(double h, double s, double b){
         this.h=h;
         this.s=s;
         this.b=b;
     }
+
+    public double size(){return size;}
+
+    public void setSize(double size){this.size=size;}
+
+    public double x(){return x;}
+
+    public double y(){return y;}
 
     public void setCoord(double x, double y){
         this.x=x;
@@ -105,6 +107,7 @@ public class User {
     public void lineTo(double x, double y){
         gc.beginPath();
         gc.setStroke(color());
+        gc.setLineWidth(size);
         gc.moveTo(this.x,this.y);
         if(tool==null)tool=new Brush();//todo tmp
         tool.lineTo(x,y);
