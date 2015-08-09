@@ -100,7 +100,8 @@ public class Controller implements Initializable{
         }
 
         setHue(0);
-        setColor(0, 0);
+        setColor(0,0);
+        brushSizeText.setText(me().size()+"");
 
         undo.add(canvas.snapshot(null,null));
         if(undo.size()<=1)undoBtn.setDisable(true);
@@ -170,6 +171,17 @@ public class Controller implements Initializable{
             parseColor();
         });
 
+        brushSizeText.textProperty().addListener((observable,oldValue,newValue)->{
+            double size=1;
+            try{
+                size=Double.parseDouble(newValue);
+            }
+            catch (NumberFormatException e){
+
+            }
+            me().setSize(size);
+        });
+
         spinner.setTitle("Please wait");
         spinner.setContentText("Waiting for host response");
         spinner.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL);
@@ -209,6 +221,10 @@ public class Controller implements Initializable{
     }
 
     public void setColor(double s, double b){
+        if(s<0)s=0;
+        if(s>1.0)s=1;
+        if(b<0)b=0;
+        if(b>1.0)b=1;
         this.s=s;
         this.b=b;
         redrawColor();
@@ -238,10 +254,10 @@ public class Controller implements Initializable{
         catch (Exception e){b=0;}
         if(h>360)h=360;
         if(h<0)h=0;
-        if(s>100)h=100;
-        if(s<0)h=0;
-        if(b>100)h=100;
-        if(b<0)h=0;
+        if(s>100)s=100;
+        if(s<0)s=0;
+        if(b>100)b=100;
+        if(b<0)b=0;
         setHue(h);
         setColor((double)s/100,(double)b/100);
         curC.setFill(Color.hsb(h,(double)s/100,(double)b/100));
