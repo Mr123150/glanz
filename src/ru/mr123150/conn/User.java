@@ -95,7 +95,7 @@ public class User {
         this.y=y;
     }
 
-    public String tool(){return tool==null?"NULL":tool.title();}
+    public String toolText(){return tool==null?"NULL":tool.title();}
 
     public void setTool(Tool tool){
         tool.setContext(gc);

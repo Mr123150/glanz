@@ -306,10 +306,11 @@ public class Controller implements Initializable{
         Optional<Vector<String>> result = connectDialog.showAndWait();
         result.ifPresent(data->{
             try{
+                User tmp_user=me();
                 conn=new Connection(data.get(0),5050);
                 hconn=new Connection(5051,false);
                 listen();
-                send("CONNECT;REQUEST;" + conn.getAddress());
+                send("CONNECT;REQUEST;" + conn.getAddress() + ";" + tmp_user.toolText() + ";" + tmp_user.x() + ";" + tmp_user.y() + ";" + tmp_user.colorText());
                 spinner.show();
             }
             catch (Exception e){
@@ -393,22 +394,35 @@ public class Controller implements Initializable{
                         case "REQUEST":
                             try {
                                 int new_id=conn.users.lastElement().id()+1;
-                                conn.users.add(new User(new_id,arr[2]));
+                                User new_user=new User(new_id,arr[2],gc);
+                                conn.users.add(new_user);
                                 Alert alert=new Alert(Alert.AlertType.CONFIRMATION);
                                 alert.setTitle("Connection request");
                                 alert.setContentText("Connection request from IP " + arr[2] + ". Allow?");
                                 send("CONNECT;TEST");
                                 Optional<ButtonType> result=alert.showAndWait();
                                 if (result.get() == ButtonType.OK){
+                                    switch (arr[3]){
+                                        case "BRUSH":
+                                            new_user.setTool(new Brush());
+                                            break;
+                                        case "ERASER":
+
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    new_user.setCoord(Double.parseDouble(arr[4]),Double.parseDouble(arr[5]));
+                                    new_user.setColor(Double.parseDouble(arr[6]),Double.parseDouble(arr[7]),Double.parseDouble(arr[8]));
                                     userScroll.add(new UserNode(new_id,arr[2],true));
                                     send("CONNECT;ACCEPT;" + new_id + ";" + arr[2]);
                                     send("SYNC;"+ new_id +";SIZE;" + canvas.getWidth() + ";" + canvas.getHeight() + ";" + arr[2]);
                                     send("SYNC;"+ new_id +";LAYERS;1"); //Stub for multi-layers
                                     send("SYNC;"+ new_id +";DATA;0;data"); //Stub for data sync
                                     for(User user:conn.users){
-                                        send("SYNC;"+ new_id +";USER;"+user.id()+";"+user.addressText()+";"+user.tool()+";"+user.colorText()+";"+user.x()+";"+user.y());
+                                        send("SYNC;"+ new_id +";USER;"+user.id()+";"+user.addressText()+";"+user.toolText()+";"+user.colorText()+";"+user.x()+";"+user.y());
                                     }
-                                    send("CHANGE;USER;ADD;"+new_id+";"+arr[2]);
+                                    send("CHANGE;USER;ADD;"+new_id+";"+arr[2]+";"+arr[3]+";"+arr[4]+";"+arr[5]+";"+arr[6]+";"+arr[7]+";"+arr[8]);
                                 } else {
                                     send("CONNECT;REJECT;" + arr[2]);
                                     conn.users.remove(conn.users.size()-1);
@@ -541,12 +555,28 @@ public class Controller implements Initializable{
                                     case "ADD":
                                         int new_id=Integer.parseInt(arr[3]);
                                         if(conn.getUserById(new_id)==-1){
-                                            try {
-                                                conn.users.add(new User(new_id, arr[4]));
-                                                userScroll.add(new UserNode(new_id,arr[4],false));
-                                            }
-                                            catch(Exception e){
-                                                e.printStackTrace();
+                                            int sync_id=Integer.parseInt(arr[3]);
+                                            if(sync_id!=me().id()&&sync_id!=0) {
+                                                try {
+                                                    User new_user = new User(sync_id, arr[4]);
+                                                    new_user.setContext(gc);
+                                                    new_user.setColor(Double.parseDouble(arr[6]), Double.parseDouble(arr[7]), Double.parseDouble(arr[8]));
+                                                    new_user.setCoord(Double.parseDouble(arr[9]), Double.parseDouble(arr[10]));
+                                                    switch (arr[5]) {
+                                                        case "BRUSH":
+                                                            new_user.setTool(new Brush());
+                                                            break;
+                                                        case "ERASER":
+
+                                                            break;
+                                                        default:
+                                                            break;
+                                                    }
+                                                    conn.users.add(new_user);
+                                                    userScroll.add(new UserNode(new_id, arr[4], false));
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+                                                }
                                             }
                                         }
                                         break;
