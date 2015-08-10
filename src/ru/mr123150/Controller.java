@@ -23,6 +23,7 @@ import ru.mr123150.gui.TextNode;
 import ru.mr123150.gui.UserNode;
 import ru.mr123150.tool.Brush;
 import ru.mr123150.tool.Eraser;
+import ru.mr123150.tool.Picker;
 
 import java.net.URL;
 import java.util.Optional;
@@ -305,6 +306,11 @@ public class Controller implements Initializable{
         send("CHANGE;TOOL;ERASER");
     }
 
+    @FXML public void toolPicker(){
+        me().setTool(new Picker());
+        send("CHANGE;TOOL;PICKER");
+    }
+
     @FXML public void chat(){
         String msg=chatText.getText();
         msg=msg.replace(";",":");
@@ -547,7 +553,10 @@ public class Controller implements Initializable{
                                             new_user.setTool(new Brush());
                                             break;
                                         case "ERASER":
-
+                                            new_user.setTool(new Eraser());
+                                            break;
+                                        case "PICKER":
+                                            new_user.setTool(new Picker());
                                             break;
                                         default:
                                             break;
@@ -587,7 +596,10 @@ public class Controller implements Initializable{
                                                             new_user.setTool(new Brush());
                                                             break;
                                                         case "ERASER":
-
+                                                            new_user.setTool(new Eraser());
+                                                            break;
+                                                        case "PICKER":
+                                                            new_user.setTool(new Picker());
                                                             break;
                                                         default:
                                                             break;
@@ -626,6 +638,9 @@ public class Controller implements Initializable{
                                         break;
                                     case "ERASER":
                                         conn.users.get(user_id).setTool(new Eraser());
+                                        break;
+                                    case "PICKER":
+                                        conn.users.get(user_id).setTool(new Picker());
                                         break;
                                     default:
                                         break;

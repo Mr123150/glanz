@@ -18,9 +18,9 @@ public abstract class Tool {
 
     public void setContext(GraphicsContext gc){this.gc=gc;}
 
-    public abstract void lineTo(double x, double y);
+    public abstract Color lineTo(double x, double y);
 
-    public abstract void dot(double x, double y);
+    public abstract Color dot(double x, double y);
 
     public String title(){return title;}
 }

@@ -84,6 +84,12 @@ public class User {
         this.b=b;
     }
 
+    public void setColor(Color color){
+        this.h=color.getHue();
+        this.s=color.getSaturation();
+        this.b=color.getBrightness();
+    }
+
     public double size(){return size;}
 
     public void setSize(double size){this.size=size;}
@@ -110,13 +116,15 @@ public class User {
         gc.setLineWidth(size);
         gc.moveTo(this.x,this.y);
         if(tool==null)tool=new Brush();//todo tmp
-        tool.lineTo(x,y);
+        Color tmp=tool.lineTo(x,y);
+        if(tmp!=null)setColor(tmp);
         setCoord(x,y);
         gc.closePath();
     }
 
     public void dot(double x, double y){
         gc.setFill(color());
-        tool.dot(x,y);
+        Color tmp=tool.dot(x,y);
+        if(tmp!=null)setColor(tmp);
     }
 }

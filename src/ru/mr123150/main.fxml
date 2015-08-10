@@ -25,7 +25,7 @@
             </fx:define>
             <ToggleButton toggleGroup="$toolGroup" text="Brush" selected="true" onAction="#toolBrush"/>
             <ToggleButton toggleGroup="$toolGroup" text="Eraser" onAction="#toolEraser"/>
-            <ToggleButton toggleGroup="$toolGroup" text="Picker"/>
+            <ToggleButton toggleGroup="$toolGroup" text="Picker" onAction="#toolPicker"/>
         </VBox>
     </left>
     <right>
