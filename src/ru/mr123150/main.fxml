@@ -4,6 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import ru.mr123150.gui.ScrollList?>
 <?import javafx.scene.text.Text?>
+<?import javafx.scene.Group?>
 <BorderPane fx:controller="ru.mr123150.Controller" fx:id="rootPane" xmlns:fx="http://javafx.com/fxml">
     <top>
         <HBox fx:id="topBox">
@@ -19,7 +20,12 @@
     </center>
     <left>
         <VBox fx:id="leftBox">
-
+            <fx:define>
+                <ToggleGroup fx:id="toolGroup"/>
+            </fx:define>
+            <ToggleButton toggleGroup="$toolGroup" text="Brush"/>
+            <ToggleButton toggleGroup="$toolGroup" text="Eraser"/>
+            <ToggleButton toggleGroup="$toolGroup" text="Picker"/>
         </VBox>
     </left>
     <right>
