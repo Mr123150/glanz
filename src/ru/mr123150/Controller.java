@@ -2,6 +2,7 @@ package ru.mr123150;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
@@ -21,6 +22,7 @@ import ru.mr123150.gui.ScrollList;
 import ru.mr123150.gui.TextNode;
 import ru.mr123150.gui.UserNode;
 import ru.mr123150.tool.Brush;
+import ru.mr123150.tool.Eraser;
 
 import java.net.URL;
 import java.util.Optional;
@@ -291,6 +293,16 @@ public class Controller implements Initializable{
         if(redo.isEmpty())redoBtn.setDisable(true);
         if(undo.size()>1)undoBtn.setDisable(false);
         if(send)send("CHANGE;REDO");
+    }
+
+    @FXML public void toolBrush(){
+        me().setTool(new Brush());
+        send("CHANGE;TOOL;BRUSH");
+    }
+
+    @FXML public void toolEraser(){
+        me().setTool(new Eraser());
+        send("CHANGE;TOOL;ERASER");
     }
 
     @FXML public void chat(){
@@ -607,6 +619,18 @@ public class Controller implements Initializable{
                                 redo(false);
                                 if(conn.isHost())send(str,false);
                                 break;
+                            case "TOOL":
+                                switch (arr[2]){
+                                    case "BRUSH":
+                                        conn.users.get(user_id).setTool(new Brush());
+                                        break;
+                                    case "ERASER":
+                                        conn.users.get(user_id).setTool(new Eraser());
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                if(conn.isHost())send(str,false);
                             default:
                                 break;
                         }

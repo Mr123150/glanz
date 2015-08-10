@@ -23,8 +23,8 @@
             <fx:define>
                 <ToggleGroup fx:id="toolGroup"/>
             </fx:define>
-            <ToggleButton toggleGroup="$toolGroup" text="Brush"/>
-            <ToggleButton toggleGroup="$toolGroup" text="Eraser"/>
+            <ToggleButton toggleGroup="$toolGroup" text="Brush" selected="true" onAction="#toolBrush"/>
+            <ToggleButton toggleGroup="$toolGroup" text="Eraser" onAction="#toolEraser"/>
             <ToggleButton toggleGroup="$toolGroup" text="Picker"/>
         </VBox>
     </left>
