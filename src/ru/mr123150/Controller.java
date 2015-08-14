@@ -111,9 +111,9 @@ public class Controller implements Initializable{
         if(redo.isEmpty())redoBtn.setDisable(true);
         userScroll.init(this);
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-            me().dot(event.getX(),event.getY());
+            if(me().tool().returnable()) setColor(me().dot(event.getX(),event.getY()));
+            else me().dot(event.getX(),event.getY());
             send("DRAW;CLICK;" + event.getX() + ";" + event.getY());
-
             undo.add(canvas.snapshot(null, null));
             if (undo.size() > 1) undoBtn.setDisable(false);
         });
@@ -126,7 +126,8 @@ public class Controller implements Initializable{
         });
 
         canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
-            me().lineTo(event.getX(),event.getY());
+            if(me().tool().returnable()) setColor(me().lineTo(event.getX(),event.getY()));
+            else me().lineTo(event.getX(),event.getY());
             send("DRAW;DRAG;"+event.getX()+";"+event.getY());
         });
 
@@ -211,7 +212,7 @@ public class Controller implements Initializable{
         gc.drawImage(undo.get(0),0,0);
     }
 
-    public void setHue(double h){
+    public void setHue(double h){ //TODO rewrite to one func setColor
         hc.clearRect(0,0,hcolor.getWidth(),hcolor.getHeight());
         this.h=h;
         for(int i=0;i<hcolor.getWidth();++i){
@@ -231,6 +232,11 @@ public class Controller implements Initializable{
         this.s=s;
         this.b=b;
         redrawColor();
+    }
+
+    public void setColor(Color color){
+        setHue(color.getHue()); //TODO rewrite
+        setColor(color.getSaturation(),color.getBrightness());
     }
 
     public void redrawColor(){

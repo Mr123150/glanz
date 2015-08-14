@@ -10,6 +10,7 @@ public abstract class Tool {
 
     protected GraphicsContext gc;
     protected String title="NULL";
+    protected boolean returnable=false;
     public Tool(){}
 
     public Tool(GraphicsContext gc){
@@ -17,6 +18,8 @@ public abstract class Tool {
     }
 
     public void setContext(GraphicsContext gc){this.gc=gc;}
+
+    public boolean returnable(){return this.returnable;}
 
     public abstract Color lineTo(double x, double y);
 

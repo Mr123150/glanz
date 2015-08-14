@@ -103,6 +103,8 @@ public class User {
         this.y=y;
     }
 
+    public Tool tool(){return tool;}
+
     public String toolText(){return tool==null?"NULL":tool.title();}
 
     public void setTool(Tool tool){
@@ -110,21 +112,30 @@ public class User {
         this.tool=tool;
     }
 
-    public void lineTo(double x, double y){
+    public Color lineTo(double x, double y){
         gc.beginPath();
         gc.setStroke(color());
         gc.setLineWidth(size);
         gc.moveTo(this.x,this.y);
         if(tool==null)tool=new Brush();//todo tmp
-        Color tmp=tool.lineTo(x,y);
-        if(tmp!=null)setColor(tmp);
         setCoord(x,y);
-        gc.closePath();
+        if(tool.returnable()) {
+            return tool.lineTo(x, y);
+        }
+        else {
+            setColor(tool.lineTo(x,y));
+            return null;
+        }
     }
 
-    public void dot(double x, double y){
+    public Color dot(double x, double y){
         gc.setFill(color());
-        Color tmp=tool.dot(x,y);
-        if(tmp!=null)setColor(tmp);
+        if(tool.returnable()) {
+            return tool.dot(x, y);
+        }
+        else {
+            setColor(tool.dot(x,y));
+            return null;
+        }
     }
 }
