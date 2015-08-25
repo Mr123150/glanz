@@ -111,8 +111,11 @@ public class Controller implements Initializable{
         if(redo.isEmpty())redoBtn.setDisable(true);
         userScroll.init(this);
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-            if(me().tool().returnable()) setColor(me().dot(event.getX(),event.getY()));
-            else me().dot(event.getX(),event.getY());
+            try{
+                if(me().tool().returnable()) setColor(me().dot(event.getX(),event.getY()));
+                else me().dot(event.getX(),event.getY());
+            }
+            catch(NullPointerException e){}
             send("DRAW;CLICK;" + event.getX() + ";" + event.getY());
             undo.add(canvas.snapshot(null, null));
             if (undo.size() > 1) undoBtn.setDisable(false);
@@ -126,8 +129,11 @@ public class Controller implements Initializable{
         });
 
         canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
-            if(me().tool().returnable()) setColor(me().lineTo(event.getX(),event.getY()));
-            else me().lineTo(event.getX(),event.getY());
+            try {
+                if (me().tool().returnable()) setColor(me().lineTo(event.getX(), event.getY()));
+                else me().lineTo(event.getX(), event.getY());
+            }
+            catch(NullPointerException e){}
             send("DRAW;DRAG;"+event.getX()+";"+event.getY());
         });
 
@@ -237,6 +243,9 @@ public class Controller implements Initializable{
     public void setColor(Color color){
         setHue(color.getHue()); //TODO rewrite
         setColor(color.getSaturation(),color.getBrightness());
+        hColorText.setText((int)color.getHue()+"");
+        sColorText.setText((int)(100*color.getSaturation())+"");
+        bColorText.setText((int)(100*color.getBrightness())+"");
     }
 
     public void redrawColor(){
