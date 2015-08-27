@@ -1,5 +1,6 @@
 package ru.mr123150.tool;
 
+import javafx.scene.Cursor;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -11,6 +12,7 @@ public abstract class Tool {
     protected GraphicsContext gc;
     protected String title="NULL";
     protected boolean returnable=false;
+    protected Cursor cursor=null;
     public Tool(){}
 
     public Tool(GraphicsContext gc){
@@ -26,4 +28,6 @@ public abstract class Tool {
     public abstract Color dot(double x, double y);
 
     public String title(){return title;}
+
+    public Cursor cursor(){return cursor!=null?cursor:Cursor.DEFAULT;}
 }

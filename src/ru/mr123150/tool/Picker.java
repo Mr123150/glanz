@@ -1,5 +1,6 @@
 package ru.mr123150.tool;
 
+import javafx.scene.Cursor;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
@@ -11,6 +12,7 @@ public class Picker extends Tool {
     public Picker(){
         title="PICKER";
         returnable=true;
+        cursor=Cursor.CROSSHAIR;
     }
 
     public Color lineTo(double x, double y){
