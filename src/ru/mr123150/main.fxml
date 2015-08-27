@@ -4,6 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import ru.mr123150.gui.ScrollList?>
 <?import javafx.scene.text.Text?>
+<?import javafx.scene.Group?>
 <BorderPane fx:controller="ru.mr123150.Controller" fx:id="rootPane" xmlns:fx="http://javafx.com/fxml">
     <top>
         <HBox fx:id="topBox">
@@ -11,6 +12,7 @@
             <Button fx:id="hostBtn" onAction="#host" text="Host" />
             <Button fx:id="undoBtn" onAction="#undo" text="Undo" />
             <Button fx:id="redoBtn" onAction="#redo" text="Redo" />
+            <TextField fx:id="brushSizeText" prefWidth="50" text=""/>
         </HBox>
     </top>
     <center>
@@ -18,7 +20,12 @@
     </center>
     <left>
         <VBox fx:id="leftBox">
-
+            <fx:define>
+                <ToggleGroup fx:id="toolGroup"/>
+            </fx:define>
+            <ToggleButton toggleGroup="$toolGroup" text="Brush" selected="true" onAction="#toolBrush"/>
+            <ToggleButton toggleGroup="$toolGroup" text="Eraser" onAction="#toolEraser"/>
+            <ToggleButton toggleGroup="$toolGroup" text="Picker" onAction="#toolPicker"/>
         </VBox>
     </left>
     <right>

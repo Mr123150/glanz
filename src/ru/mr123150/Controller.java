@@ -2,6 +2,7 @@ package ru.mr123150;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
@@ -20,6 +21,9 @@ import ru.mr123150.conn.User;
 import ru.mr123150.gui.ScrollList;
 import ru.mr123150.gui.TextNode;
 import ru.mr123150.gui.UserNode;
+import ru.mr123150.tool.Brush;
+import ru.mr123150.tool.Eraser;
+import ru.mr123150.tool.Picker;
 
 import java.net.URL;
 import java.util.Optional;
@@ -40,6 +44,8 @@ public class Controller implements Initializable{
 
     @FXML Button undoBtn;
     @FXML Button redoBtn;
+
+    @FXML TextField brushSizeText;
 
     @FXML TextField hColorText;
     @FXML TextField sColorText;
@@ -66,6 +72,8 @@ public class Controller implements Initializable{
 
     double h,s,b;
 
+    User user;
+
     Dialog<ButtonType> spinner = new Dialog<>();
 
     @Override
@@ -77,9 +85,6 @@ public class Controller implements Initializable{
         curC=curColor.getGraphicsContext2D();
         curC.fillRect(0,0,curColor.getWidth(),curColor.getHeight());
 
-        setHue(0);
-        setColor(0, 0);
-
         gc=canvas.getGraphicsContext2D();
         gc.beginPath();
         gc.moveTo(0, 0);
@@ -87,19 +92,31 @@ public class Controller implements Initializable{
         gc.lineTo(canvas.getWidth(), canvas.getHeight());
         gc.lineTo(0, canvas.getHeight());
         gc.lineTo(0, 0);
-        //gc.closePath();
         gc.stroke();
+
+        try {
+            user = new User(gc);
+            user.setTool(new Brush());
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+        setHue(0);
+        setColor(0,0);
+        brushSizeText.setText(me().size()+"");
 
         undo.add(canvas.snapshot(null,null));
         if(undo.size()<=1)undoBtn.setDisable(true);
         if(redo.isEmpty())redoBtn.setDisable(true);
         userScroll.init(this);
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-            if (conn != null && !conn.users.isEmpty()) gc.setFill(conn.users.get(0).color());
-            else gc.setFill(Color.hsb(h, s, b));
-            gc.fillOval(event.getX(), event.getY(), gc.getLineWidth(), gc.getLineWidth());
+            try{
+                if(me().tool().returnable()) setColor(me().dot(event.getX(),event.getY()));
+                else me().dot(event.getX(),event.getY());
+            }
+            catch(NullPointerException e){}
             send("DRAW;CLICK;" + event.getX() + ";" + event.getY());
-
             undo.add(canvas.snapshot(null, null));
             if (undo.size() > 1) undoBtn.setDisable(false);
         });
@@ -107,32 +124,20 @@ public class Controller implements Initializable{
         statusLabel.setText("");
 
         canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
-            if(conn!=null&&!conn.users.isEmpty()) {
-                conn.users.get(0).setCoord(event.getX(),event.getY());
-            }
-            else {
-                gc.beginPath();
-                gc.moveTo(event.getX(), event.getY());
-            }
+            me().setCoord(event.getX(), event.getY());
             send("DRAW;PRESS;"+event.getX()+";"+event.getY());
         });
 
         canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
-            if(conn!=null&&!conn.users.isEmpty()) {
-                gc.beginPath();
-                gc.setStroke(conn.users.get(0).color());
-                gc.moveTo(conn.users.get(0).x(),conn.users.get(0).y());
-                conn.users.get(0).setCoord(event.getX(),event.getY());
+            try {
+                if (me().tool().returnable()) setColor(me().lineTo(event.getX(), event.getY()));
+                else me().lineTo(event.getX(), event.getY());
             }
-            else gc.setStroke(Color.hsb(h,s,b));
-            gc.lineTo(event.getX(), event.getY());
-            gc.stroke();
-            if(conn!=null&&!conn.users.isEmpty()) gc.closePath();
+            catch(NullPointerException e){}
             send("DRAW;DRAG;"+event.getX()+";"+event.getY());
         });
 
         canvas.addEventHandler(MouseEvent.MOUSE_RELEASED, event -> {
-            //gc.closePath();
             send("DRAW;RELEASE");
         });
 
@@ -176,9 +181,24 @@ public class Controller implements Initializable{
             parseColor();
         });
 
+        brushSizeText.textProperty().addListener((observable,oldValue,newValue)->{
+            double size=1;
+            try{
+                size=Double.parseDouble(newValue);
+            }
+            catch (NumberFormatException e){
+
+            }
+            me().setSize(size);
+        });
+
         spinner.setTitle("Please wait");
         spinner.setContentText("Waiting for host response");
         spinner.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL);
+    }
+
+    public User me(){
+        return conn==null?user:conn.users.get(0);
     }
 
     public void resizeCanvas(){
@@ -198,7 +218,7 @@ public class Controller implements Initializable{
         gc.drawImage(undo.get(0),0,0);
     }
 
-    public void setHue(double h){
+    public void setHue(double h){ //TODO rewrite to one func setColor
         hc.clearRect(0,0,hcolor.getWidth(),hcolor.getHeight());
         this.h=h;
         for(int i=0;i<hcolor.getWidth();++i){
@@ -211,16 +231,26 @@ public class Controller implements Initializable{
     }
 
     public void setColor(double s, double b){
+        if(s<0)s=0;
+        if(s>1.0)s=1;
+        if(b<0)b=0;
+        if(b>1.0)b=1;
         this.s=s;
         this.b=b;
         redrawColor();
     }
 
+    public void setColor(Color color){
+        setHue(color.getHue()); //TODO rewrite
+        setColor(color.getSaturation(),color.getBrightness());
+        hColorText.setText((int)color.getHue()+"");
+        sColorText.setText((int)(100*color.getSaturation())+"");
+        bColorText.setText((int)(100*color.getBrightness())+"");
+    }
+
     public void redrawColor(){
-        if(conn!=null) {
-            conn.users.get(0).setColor(h, s, b);
-            send("CHANGE;COLOR;"+h+";"+s+";"+b);
-        }
+        me().setColor(h, s, b);
+        send("CHANGE;COLOR;"+h+";"+s+";"+b);
         cc.clearRect(0,0,color.getWidth(),color.getHeight());
         for(int i=0;i<color.getWidth();++i){
             for(int j=0;j<color.getHeight();++j){
@@ -242,10 +272,10 @@ public class Controller implements Initializable{
         catch (Exception e){b=0;}
         if(h>360)h=360;
         if(h<0)h=0;
-        if(s>100)h=100;
-        if(s<0)h=0;
-        if(b>100)h=100;
-        if(b<0)h=0;
+        if(s>100)s=100;
+        if(s<0)s=0;
+        if(b>100)b=100;
+        if(b<0)b=0;
         setHue(h);
         setColor((double)s/100,(double)b/100);
         curC.setFill(Color.hsb(h,(double)s/100,(double)b/100));
@@ -281,10 +311,25 @@ public class Controller implements Initializable{
         if(send)send("CHANGE;REDO");
     }
 
+    @FXML public void toolBrush(){
+        me().setTool(new Brush());
+        send("CHANGE;TOOL;BRUSH");
+    }
+
+    @FXML public void toolEraser(){
+        me().setTool(new Eraser());
+        send("CHANGE;TOOL;ERASER");
+    }
+
+    @FXML public void toolPicker(){
+        me().setTool(new Picker());
+        send("CHANGE;TOOL;PICKER");
+    }
+
     @FXML public void chat(){
         String msg=chatText.getText();
         msg=msg.replace(";",":");
-        TextNode node=new TextNode(0,conn.users.get(0).id()+"",msg);
+        TextNode node=new TextNode(0,me().id()+"",msg);
         node.showId(false);
         chatScroll.add(node);
         send("CHAT;" + msg);
@@ -311,10 +356,11 @@ public class Controller implements Initializable{
         Optional<Vector<String>> result = connectDialog.showAndWait();
         result.ifPresent(data->{
             try{
+                User tmp_user=me();
                 conn=new Connection(data.get(0),5050);
                 hconn=new Connection(5051,false);
                 listen();
-                send("CONNECT;REQUEST;" + conn.getAddress());
+                send("CONNECT;REQUEST;" + conn.getAddress() + ";" + tmp_user.toolText() + ";" + tmp_user.x() + ";" + tmp_user.y() + ";" + tmp_user.colorText());
                 spinner.show();
             }
             catch (Exception e){
@@ -331,8 +377,9 @@ public class Controller implements Initializable{
             System.out.println("//SERVER STARTED");
             statusLabel.setText("Server started at "+conn.getAddress());
             listen();
-            conn.users.insertElementAt(new User(), 0);
-            conn.users.get(0).setColor(h, s, b);
+            conn.users.insertElementAt(new User(gc), 0);
+            me().setColor(h, s, b);
+            me().setTool(new Brush());
         }
 
         catch (Exception e){
@@ -397,22 +444,35 @@ public class Controller implements Initializable{
                         case "REQUEST":
                             try {
                                 int new_id=conn.users.lastElement().id()+1;
-                                conn.users.add(new User(new_id,arr[2]));
+                                User new_user=new User(new_id,arr[2],gc);
+                                conn.users.add(new_user);
                                 Alert alert=new Alert(Alert.AlertType.CONFIRMATION);
                                 alert.setTitle("Connection request");
                                 alert.setContentText("Connection request from IP " + arr[2] + ". Allow?");
                                 send("CONNECT;TEST");
                                 Optional<ButtonType> result=alert.showAndWait();
                                 if (result.get() == ButtonType.OK){
+                                    switch (arr[3]){
+                                        case "BRUSH":
+                                            new_user.setTool(new Brush());
+                                            break;
+                                        case "ERASER":
+
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    new_user.setCoord(Double.parseDouble(arr[4]),Double.parseDouble(arr[5]));
+                                    new_user.setColor(Double.parseDouble(arr[6]),Double.parseDouble(arr[7]),Double.parseDouble(arr[8]));
                                     userScroll.add(new UserNode(new_id,arr[2],true));
                                     send("CONNECT;ACCEPT;" + new_id + ";" + arr[2]);
                                     send("SYNC;"+ new_id +";SIZE;" + canvas.getWidth() + ";" + canvas.getHeight() + ";" + arr[2]);
                                     send("SYNC;"+ new_id +";LAYERS;1"); //Stub for multi-layers
                                     send("SYNC;"+ new_id +";DATA;0;data"); //Stub for data sync
                                     for(User user:conn.users){
-                                        send("SYNC;"+ new_id +";USER;"+user.id()+";"+user.addressText()+";"+user.colorText());
+                                        send("SYNC;"+ new_id +";USER;"+user.id()+";"+user.addressText()+";"+user.toolText()+";"+user.colorText()+";"+user.x()+";"+user.y());
                                     }
-                                    send("CHANGE;USER;ADD;"+new_id+";"+arr[2]);
+                                    send("CHANGE;USER;ADD;"+new_id+";"+arr[2]+";"+arr[3]+";"+arr[4]+";"+arr[5]+";"+arr[6]+";"+arr[7]+";"+arr[8]);
                                 } else {
                                     send("CONNECT;REJECT;" + arr[2]);
                                     conn.users.remove(conn.users.size()-1);
@@ -423,11 +483,12 @@ public class Controller implements Initializable{
                             break;
                         case "ACCEPT":
                             try {
-                                conn.users.insertElementAt(new User(Integer.parseInt(arr[2])),0);
-                                conn.users.insertElementAt(new User(), 1);
-                                userScroll.add(new UserNode(0,conn.getAddress(),false));
-                                userScroll.add(new UserNode(Integer.parseInt(arr[2]),arr[3],false));
-                                conn.users.get(0).setColor(h, s, b);
+                                conn.users.insertElementAt(new User(Integer.parseInt(arr[2]),gc), 0);
+                                conn.users.insertElementAt(new User(gc), 1);
+                                userScroll.add(new UserNode(0, conn.getAddress(), false));
+                                userScroll.add(new UserNode(Integer.parseInt(arr[2]), arr[3], false));
+                                me().setColor(h, s, b);
+                                me().setTool(new Brush());
                                 if(spinner.isShowing())spinner.hide();
                                 statusLabel.setText("Successfully connected");
                             }
@@ -465,14 +526,12 @@ public class Controller implements Initializable{
                     break;
                 }
             case "DRAW":
-                if(conn.isHost()||id!=conn.users.get(0).id()) {
+                if(conn.isHost()||id!=me().id()) {
                     int user_id=conn.getUserById(id);
 
                     switch (arr[1]) {
                         case "CLICK":
-                            if(conn.users.get(user_id)!=null) gc.setFill(conn.users.get(user_id).color());
-                            else gc.setFill(Color.BLACK);
-                            gc.fillOval(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]), 2 * gc.getLineWidth(), 2 * gc.getLineWidth());
+                            conn.users.get(user_id).dot(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
                             undo.add(canvas.snapshot(null,null));
                             if(undo.size()>1)undoBtn.setDisable(false);
                             if (conn.isHost()) send(str,false);
@@ -482,14 +541,7 @@ public class Controller implements Initializable{
                             if (conn.isHost()) send(str,false);
                             break;
                         case "DRAG":
-                            if(user_id!=-1) gc.setStroke(conn.users.get(user_id).color());
-                            else gc.setStroke(Color.BLACK);
-                            gc.beginPath();
-                            gc.moveTo(conn.users.get(user_id).x(), conn.users.get(user_id).y());
-                            gc.lineTo(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
-                            conn.users.get(user_id).setCoord(Double.parseDouble(arr[2]),Double.parseDouble(arr[3]));
-                            gc.stroke();
-                            gc.closePath();
+                            conn.users.get(user_id).lineTo(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
                             if (conn.isHost()) send(str,false);
                             break;
                         case "RELEASE":
@@ -501,14 +553,29 @@ public class Controller implements Initializable{
                 }
                 break;
             case "SYNC":
-                if(Integer.parseInt(arr[1])==conn.users.get(0).id()){
+                if(Integer.parseInt(arr[1])==me().id()){
                     switch(arr[2]){
                         case "USER":
                             try {
                                 int sync_id=Integer.parseInt(arr[3]);
-                                if(sync_id!=conn.users.get(0).id()&&sync_id!=0) {
+                                if(sync_id!=me().id()&&sync_id!=0) {
                                     User new_user = new User(sync_id, arr[4]);
-                                    new_user.setColor(Double.parseDouble(arr[5]), Double.parseDouble(arr[6]), Double.parseDouble(arr[7]));
+                                    new_user.setContext(gc);
+                                    new_user.setColor(Double.parseDouble(arr[6]), Double.parseDouble(arr[7]), Double.parseDouble(arr[8]));
+                                    new_user.setCoord(Double.parseDouble(arr[9]),Double.parseDouble(arr[10]));
+                                    switch (arr[5]){
+                                        case "BRUSH":
+                                            new_user.setTool(new Brush());
+                                            break;
+                                        case "ERASER":
+                                            new_user.setTool(new Eraser());
+                                            break;
+                                        case "PICKER":
+                                            new_user.setTool(new Picker());
+                                            break;
+                                        default:
+                                            break;
+                                    }
                                     conn.users.add(new_user);
                                     userScroll.add(new UserNode(Integer.parseInt(arr[3]), arr[4], false));
                                 }
@@ -523,7 +590,7 @@ public class Controller implements Initializable{
                 }
                 break;
             case "CHANGE":
-                if(conn.isHost()||id!=conn.users.get(0).id()) {
+                if(conn.isHost()||id!=me().id()) {
                     int user_id=conn.getUserById(id);
                     if(user_id!=-1) {
                         switch (arr[1]) {
@@ -532,12 +599,31 @@ public class Controller implements Initializable{
                                     case "ADD":
                                         int new_id=Integer.parseInt(arr[3]);
                                         if(conn.getUserById(new_id)==-1){
-                                            try {
-                                                conn.users.add(new User(new_id, arr[4]));
-                                                userScroll.add(new UserNode(new_id,arr[4],false));
-                                            }
-                                            catch(Exception e){
-                                                e.printStackTrace();
+                                            int sync_id=Integer.parseInt(arr[3]);
+                                            if(sync_id!=me().id()&&sync_id!=0) {
+                                                try {
+                                                    User new_user = new User(sync_id, arr[4]);
+                                                    new_user.setContext(gc);
+                                                    new_user.setColor(Double.parseDouble(arr[6]), Double.parseDouble(arr[7]), Double.parseDouble(arr[8]));
+                                                    new_user.setCoord(Double.parseDouble(arr[9]), Double.parseDouble(arr[10]));
+                                                    switch (arr[5]) {
+                                                        case "BRUSH":
+                                                            new_user.setTool(new Brush());
+                                                            break;
+                                                        case "ERASER":
+                                                            new_user.setTool(new Eraser());
+                                                            break;
+                                                        case "PICKER":
+                                                            new_user.setTool(new Picker());
+                                                            break;
+                                                        default:
+                                                            break;
+                                                    }
+                                                    conn.users.add(new_user);
+                                                    userScroll.add(new UserNode(new_id, arr[4], false));
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+                                                }
                                             }
                                         }
                                         break;
@@ -560,6 +646,21 @@ public class Controller implements Initializable{
                                 redo(false);
                                 if(conn.isHost())send(str,false);
                                 break;
+                            case "TOOL":
+                                switch (arr[2]){
+                                    case "BRUSH":
+                                        conn.users.get(user_id).setTool(new Brush());
+                                        break;
+                                    case "ERASER":
+                                        conn.users.get(user_id).setTool(new Eraser());
+                                        break;
+                                    case "PICKER":
+                                        conn.users.get(user_id).setTool(new Picker());
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                if(conn.isHost())send(str,false);
                             default:
                                 break;
                         }
@@ -567,7 +668,7 @@ public class Controller implements Initializable{
                 }
                 break;
             case "CHAT":
-                if(conn.isHost()||id!=conn.users.get(0).id()) {
+                if(conn.isHost()||id!=me().id()) {
                     TextNode node = new TextNode(0, arr[2], arr[1]);
                     node.showId(false);
                     chatScroll.add(node);
@@ -580,6 +681,6 @@ public class Controller implements Initializable{
     }
 
     public void disconnect(){
-        if(conn!=null&&conn.users.get(0).id()!=-1)send("DISCONNECT");
+        if(conn!=null&&me().id()!=-1)send("DISCONNECT");
     }
 }

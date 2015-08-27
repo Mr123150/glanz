@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
@@ -26,6 +27,14 @@ public class Main extends Application {
 
         stage.setOnCloseRequest(event -> {
             controller.disconnect();
+        });
+
+        controller.canvas.setOnMouseEntered(event->{
+            scene.setCursor(controller.me().tool().cursor());
+        });
+
+        controller.canvas.setOnMouseExited(event->{
+            scene.setCursor(Cursor.DEFAULT);
         });
 
         stage.setMaximized(true);
