@@ -16,7 +16,11 @@
         </HBox>
     </top>
     <center>
-        <Canvas fx:id="canvas" width="500.0" height="500.0"/>
+        <ScrollPane fx:id="canvasPane" hbarPolicy="AS_NEEDED" vbarPolicy="AS_NEEDED">
+            <content>
+                <Canvas fx:id="canvas" width="500.0" height="500.0"/>
+            </content>
+        </ScrollPane>
     </center>
     <left>
         <VBox fx:id="leftBox">

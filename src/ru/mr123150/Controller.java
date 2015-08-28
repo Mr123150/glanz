@@ -10,12 +10,10 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
+import javafx.scene.shape.StrokeLineCap;
 import ru.mr123150.conn.Connection;
 import ru.mr123150.conn.User;
 import ru.mr123150.gui.ScrollList;
@@ -41,6 +39,8 @@ public class Controller implements Initializable{
     @FXML VBox leftBox;
     @FXML VBox rightBox;
     @FXML HBox bottomBox;
+
+    @FXML ScrollPane canvasPane;
 
     @FXML Button undoBtn;
     @FXML Button redoBtn;
@@ -86,6 +86,7 @@ public class Controller implements Initializable{
         curC.fillRect(0,0,curColor.getWidth(),curColor.getHeight());
 
         gc=canvas.getGraphicsContext2D();
+        gc.setLineCap(StrokeLineCap.ROUND);
         gc.beginPath();
         gc.moveTo(0, 0);
         gc.lineTo(canvas.getWidth(),0);
@@ -202,9 +203,14 @@ public class Controller implements Initializable{
     }
 
     public void resizeCanvas(){
+        canvasPane.setPrefWidth(rootPane.getWidth()-leftBox.getWidth()-rightBox.getWidth());
+        canvasPane.setPrefHeight(rootPane.getHeight() - topBox.getHeight() - bottomBox.getHeight());
+    }
+
+    public void fitCanvas(){
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        canvas.setWidth(rootPane.getWidth()-leftBox.getWidth()-rightBox.getWidth());
-        canvas.setHeight(rootPane.getHeight() - topBox.getHeight() - bottomBox.getHeight());
+        canvas.setWidth(canvasPane.getWidth()-2);
+        canvas.setHeight(canvasPane.getHeight()-2);
         gc.beginPath();
         gc.moveTo(0, 0);
         gc.lineTo(canvas.getWidth(), 0);

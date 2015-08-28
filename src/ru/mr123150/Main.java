@@ -1,6 +1,8 @@
 package ru.mr123150;
 
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
@@ -29,18 +31,27 @@ public class Main extends Application {
             controller.disconnect();
         });
 
-        controller.canvas.setOnMouseEntered(event->{
+        controller.canvas.setOnMouseEntered(event -> {
             scene.setCursor(controller.me().tool().cursor());
         });
 
-        controller.canvas.setOnMouseExited(event->{
+        controller.canvas.setOnMouseExited(event -> {
             scene.setCursor(Cursor.DEFAULT);
+        });
+
+        scene.widthProperty().addListener((ObservableValue<? extends Number> ov, Number oldVal,Number newVal) -> {
+            controller.resizeCanvas();
+        });
+
+        scene.heightProperty().addListener((ObservableValue<? extends Number> ov, Number oldVal,Number newVal) -> {
+            controller.resizeCanvas();
         });
 
         stage.setMaximized(true);
         stage.show();
 
         controller.resizeCanvas();
+        controller.fitCanvas();
     }
 
     public static void main(String[] args) {
