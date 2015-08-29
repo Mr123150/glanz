@@ -102,8 +102,7 @@ public class Controller implements Initializable{
             e.printStackTrace();
         }
 
-        setHue(0);
-        setColor(0,0);
+        setColor(0,0,0);
         brushSizeText.setText(me().size()+"");
 
         undo.add(canvas.snapshot(null,null));
@@ -144,13 +143,13 @@ public class Controller implements Initializable{
         hcolor.addEventHandler(MouseEvent.MOUSE_PRESSED, event ->{
             int h=(int)(event.getX() / hcolor.getWidth() * 360);
             hColorText.setText(h+"");
-            setHue(h);
+            setColor(h,s,b);
         });
 
         hcolor.addEventHandler(MouseEvent.MOUSE_DRAGGED, event ->{
             int h=(int)(event.getX() / hcolor.getWidth() * 360);
             hColorText.setText(h+"");
-            setHue(h);
+            setColor(h,s,b);
         });
 
         color.addEventHandler(MouseEvent.MOUSE_PRESSED, event ->{
@@ -158,7 +157,7 @@ public class Controller implements Initializable{
             int b=(int)(100*(1 - event.getY() / color.getHeight()));
             sColorText.setText(s+"");
             bColorText.setText(b+"");
-            setColor((double)s/100,(double)b/100);
+            setColor(h,(double)s/100,(double)b/100);
         });
 
         color.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
@@ -166,7 +165,7 @@ public class Controller implements Initializable{
             int b=(int)(100*(1 - event.getY() / color.getHeight()));
             sColorText.setText(s+"");
             bColorText.setText(b+"");
-            setColor((double)s/100,(double)b/100);
+            setColor(h,(double)s/100,(double)b/100);
         });
 
         hColorText.textProperty().addListener((observable,oldValue,newValue)->{
@@ -217,40 +216,38 @@ public class Controller implements Initializable{
         undo.add(canvas.snapshot(null,null));
         gc.drawImage(undo.get(0),0,0);
     }
-
-    public void setHue(double h){ //TODO rewrite to one func setColor
-        hc.clearRect(0,0,hcolor.getWidth(),hcolor.getHeight());
-        this.h=h;
-        for(int i=0;i<hcolor.getWidth();++i){
-            hc.setStroke(Color.hsb((double)i/hcolor.getWidth()*360, 1.0, 1.0, 1.0));
-            hc.strokeLine(i, 0, i, hcolor.getHeight());
-        }
-        hc.setStroke(Color.BLACK);
-        hc.strokeOval(h / 360 * hcolor.getWidth() - hcolor.getHeight() / 2, 0, hcolor.getHeight(), hcolor.getHeight());
-        redrawColor();
-    }
-
-    public void setColor(double s, double b){
+    
+    public void setColor(double h, double s, double b){
+        if(h<0)h=0;
+        if(h>360)h=360;
         if(s<0)s=0;
         if(s>1.0)s=1;
         if(b<0)b=0;
         if(b>1.0)b=1;
+        this.h=h;
         this.s=s;
         this.b=b;
+
+        me().setColor(h, s, b);
+        send("CHANGE;COLOR;"+h+";"+s+";"+b);
         redrawColor();
     }
 
     public void setColor(Color color){
-        setHue(color.getHue()); //TODO rewrite
-        setColor(color.getSaturation(),color.getBrightness());
+        setColor(color.getHue(), color.getSaturation(),color.getBrightness());
         hColorText.setText((int)color.getHue()+"");
         sColorText.setText((int)(100*color.getSaturation())+"");
         bColorText.setText((int)(100*color.getBrightness())+"");
     }
 
     public void redrawColor(){
-        me().setColor(h, s, b);
-        send("CHANGE;COLOR;"+h+";"+s+";"+b);
+        hc.clearRect(0,0,hcolor.getWidth(),hcolor.getHeight());
+        for(int i=0;i<hcolor.getWidth();++i){
+            hc.setStroke(Color.hsb((double)i/hcolor.getWidth()*360, 1.0, 1.0, 1.0));
+            hc.strokeLine(i, 0, i, hcolor.getHeight());
+        }
+        hc.setStroke(Color.BLACK);
+        hc.strokeOval(h / 360 * hcolor.getWidth() - hcolor.getHeight() / 2, 0, hcolor.getHeight(), hcolor.getHeight());
         cc.clearRect(0,0,color.getWidth(),color.getHeight());
         for(int i=0;i<color.getWidth();++i){
             for(int j=0;j<color.getHeight();++j){
@@ -276,8 +273,7 @@ public class Controller implements Initializable{
         if(s<0)s=0;
         if(b>100)b=100;
         if(b<0)b=0;
-        setHue(h);
-        setColor((double)s/100,(double)b/100);
+        setColor(h,(double)s/100,(double)b/100);
         curC.setFill(Color.hsb(h,(double)s/100,(double)b/100));
         curC.fillRect(0,0,curColor.getWidth(),curColor.getHeight());
 
