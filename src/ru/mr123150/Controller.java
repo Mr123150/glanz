@@ -10,12 +10,10 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
+import javafx.scene.shape.StrokeLineCap;
 import ru.mr123150.conn.Connection;
 import ru.mr123150.conn.User;
 import ru.mr123150.gui.ScrollList;
@@ -41,6 +39,8 @@ public class Controller implements Initializable{
     @FXML VBox leftBox;
     @FXML VBox rightBox;
     @FXML HBox bottomBox;
+
+    @FXML ScrollPane canvasPane;
 
     @FXML Button undoBtn;
     @FXML Button redoBtn;
@@ -86,6 +86,7 @@ public class Controller implements Initializable{
         curC.fillRect(0,0,curColor.getWidth(),curColor.getHeight());
 
         gc=canvas.getGraphicsContext2D();
+        gc.setLineCap(StrokeLineCap.ROUND);
         gc.beginPath();
         gc.moveTo(0, 0);
         gc.lineTo(canvas.getWidth(),0);
@@ -200,10 +201,19 @@ public class Controller implements Initializable{
         return conn==null?user:conn.users.get(0);
     }
 
-    public void resizeCanvas(){
+    public void fitPane(){
+        canvasPane.setPrefWidth(rootPane.getWidth()-leftBox.getWidth()-rightBox.getWidth());
+        canvasPane.setPrefHeight(rootPane.getHeight() - topBox.getHeight() - bottomBox.getHeight());
+    }
+
+    public void fitCanvas(){
+        resizeCanvas(canvasPane.getWidth()-2,canvasPane.getHeight()-2);
+    }
+
+    public void resizeCanvas(double width, double height){
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        canvas.setWidth(rootPane.getWidth()-leftBox.getWidth()-rightBox.getWidth());
-        canvas.setHeight(rootPane.getHeight() - topBox.getHeight() - bottomBox.getHeight());
+        canvas.setWidth(width);
+        canvas.setHeight(height);
         gc.beginPath();
         gc.moveTo(0, 0);
         gc.lineTo(canvas.getWidth(), 0);
@@ -463,7 +473,6 @@ public class Controller implements Initializable{
                                     userScroll.add(new UserNode(new_id,arr[2],true));
                                     send("CONNECT;ACCEPT;" + new_id + ";" + arr[2]);
                                     send("SYNC;"+ new_id +";SIZE;" + canvas.getWidth() + ";" + canvas.getHeight() + ";" + arr[2]);
-                                    send("SYNC;"+ new_id +";LAYERS;1"); //Stub for multi-layers
                                     send("SYNC;"+ new_id +";DATA;0;data"); //Stub for data sync
                                     for(User user:conn.users){
                                         send("SYNC;"+ new_id +";USER;"+user.id()+";"+user.addressText()+";"+user.toolText()+";"+user.colorText()+";"+user.x()+";"+user.y());
@@ -551,6 +560,9 @@ public class Controller implements Initializable{
             case "SYNC":
                 if(Integer.parseInt(arr[1])==me().id()){
                     switch(arr[2]){
+                        case "SIZE":
+                            resizeCanvas(Double.parseDouble(arr[3]),Double.parseDouble(arr[4]));
+                            break;
                         case "USER":
                             try {
                                 int sync_id=Integer.parseInt(arr[3]);
