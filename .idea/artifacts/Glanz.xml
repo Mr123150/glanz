@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
-  <artifact type="javafx" name="Canvas beta">
-    <output-path>$PROJECT_DIR$/out/artifacts/Canvas_beta</output-path>
+  <artifact type="javafx" name="Glanz">
+    <output-path>$PROJECT_DIR$/out/artifacts/Glanz</output-path>
     <properties id="javafx-properties">
       <options>
         <option name="appClass" value="ru.mr123150.Main" />
@@ -9,7 +9,7 @@
         <option name="htmlParamFile" value="" />
         <option name="nativeBundle" value="all" />
         <option name="paramFile" value="" />
-        <option name="title" value="Canvas beta" />
+        <option name="title" value="Glanz" />
         <option name="vendor" value="" />
         <option name="width" value="1024" />
       </options>

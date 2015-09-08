@@ -18,7 +18,7 @@ public class Main extends Application {
         Controller controller=loader.getController();
 
         Scene scene=new Scene(root, 1024, 768);
-        stage.setTitle("Canvas");
+        stage.setTitle("Glanz");
         stage.setScene(scene);
 
         stage.setOnCloseRequest(event -> {
