@@ -13,7 +13,6 @@
             <Button fx:id="undoBtn" onAction="#undo" text="Undo" />
             <Button fx:id="redoBtn" onAction="#redo" text="Redo" />
             <TextField fx:id="brushSizeText" prefWidth="50" text=""/>
-            <Button onAction="#fitCanvas" text="Test"/>
         </HBox>
     </top>
     <center>
