@@ -202,15 +202,19 @@ public class Controller implements Initializable{
         return conn==null?user:conn.users.get(0);
     }
 
-    public void resizeCanvas(){
+    public void fitPane(){
         canvasPane.setPrefWidth(rootPane.getWidth()-leftBox.getWidth()-rightBox.getWidth());
         canvasPane.setPrefHeight(rootPane.getHeight() - topBox.getHeight() - bottomBox.getHeight());
     }
 
     public void fitCanvas(){
+        resizeCanvas(canvasPane.getWidth()-2,canvasPane.getHeight()-2);
+    }
+
+    public void resizeCanvas(double width, double height){
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        canvas.setWidth(canvasPane.getWidth()-2);
-        canvas.setHeight(canvasPane.getHeight()-2);
+        canvas.setWidth(width);
+        canvas.setHeight(height);
         gc.beginPath();
         gc.moveTo(0, 0);
         gc.lineTo(canvas.getWidth(), 0);
@@ -256,7 +260,7 @@ public class Controller implements Initializable{
 
     public void redrawColor(){
         me().setColor(h, s, b);
-        send("CHANGE;COLOR;"+h+";"+s+";"+b);
+        send("CHANGE;COLOR;" + h + ";" + s + ";" + b);
         cc.clearRect(0,0,color.getWidth(),color.getHeight());
         for(int i=0;i<color.getWidth();++i){
             for(int j=0;j<color.getHeight();++j){
@@ -473,7 +477,6 @@ public class Controller implements Initializable{
                                     userScroll.add(new UserNode(new_id,arr[2],true));
                                     send("CONNECT;ACCEPT;" + new_id + ";" + arr[2]);
                                     send("SYNC;"+ new_id +";SIZE;" + canvas.getWidth() + ";" + canvas.getHeight() + ";" + arr[2]);
-                                    send("SYNC;"+ new_id +";LAYERS;1"); //Stub for multi-layers
                                     send("SYNC;"+ new_id +";DATA;0;data"); //Stub for data sync
                                     for(User user:conn.users){
                                         send("SYNC;"+ new_id +";USER;"+user.id()+";"+user.addressText()+";"+user.toolText()+";"+user.colorText()+";"+user.x()+";"+user.y());
@@ -561,6 +564,9 @@ public class Controller implements Initializable{
             case "SYNC":
                 if(Integer.parseInt(arr[1])==me().id()){
                     switch(arr[2]){
+                        case "SIZE":
+                            resizeCanvas(Double.parseDouble(arr[3]),Double.parseDouble(arr[4]));
+                            break;
                         case "USER":
                             try {
                                 int sync_id=Integer.parseInt(arr[3]);

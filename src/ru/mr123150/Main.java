@@ -1,18 +1,12 @@
 package ru.mr123150;
 
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.stage.Modality;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 public class Main extends Application {
 
@@ -39,18 +33,18 @@ public class Main extends Application {
             scene.setCursor(Cursor.DEFAULT);
         });
 
-        scene.widthProperty().addListener((ObservableValue<? extends Number> ov, Number oldVal,Number newVal) -> {
-            controller.resizeCanvas();
+        scene.widthProperty().addListener((ObservableValue<? extends Number> ov, Number oldVal, Number newVal) -> {
+            controller.fitPane();
         });
 
-        scene.heightProperty().addListener((ObservableValue<? extends Number> ov, Number oldVal,Number newVal) -> {
-            controller.resizeCanvas();
+        scene.heightProperty().addListener((ObservableValue<? extends Number> ov, Number oldVal, Number newVal) -> {
+            controller.fitPane();
         });
 
         stage.setMaximized(true);
         stage.show();
 
-        controller.resizeCanvas();
+        controller.fitPane();
         controller.fitCanvas();
     }
 
