@@ -1,0 +1,11 @@
+﻿.backgroundPane {
+    -fx-background-color: #474747;
+}
+
+ToolBar{
+    -fx-background-color: #474747;
+}
+
+ToolBar Label{
+    -fx-text-fill: #eee;
+}
