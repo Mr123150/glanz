@@ -1,22 +1,39 @@
 <?import ru.mr123150.gui.ScrollList?>
-<?import javafx.scene.text.Text?>
-<?import javafx.geometry.Insets?>
-<?import java.net.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.canvas.*?>
 <?import javafx.scene.layout.*?>
 <?import ru.mr123150.gui.ScrollList?>
-<?import javafx.scene.text.Text?>
-<?import javafx.scene.Group?>
-<!--<BorderPane fx:controller="ru.mr123150.Controller" fx:id="rootPane" xmlns:fx="http://javafx.com/fxml">
+
+<BorderPane fx:controller="ru.mr123150.Controller" fx:id="rootPane" xmlns:fx="http://javafx.com/fxml" stylesheets="@./style1.css">
     <top>
-        <HBox fx:id="topBox">
-            <Button fx:id="connectBtn" onAction="#connect" text="Connect"/>
-            <Button fx:id="hostBtn" onAction="#host" text="Host" />
-            <Button fx:id="undoBtn" onAction="#undo" text="Undo" />
-            <Button fx:id="redoBtn" onAction="#redo" text="Redo" />
-            <TextField fx:id="brushSizeText" prefWidth="50" text=""/>
-        </HBox>
+        <VBox fx:id="topBox" styleClass="box">
+            <HBox>
+                <MenuBar fx:id="menuBar" styleClass="menu-bar" useSystemMenuBar="true">
+                    <Menu id="menuF" text="File">
+                        <MenuItem text="New"   accelerator="Shortcut+N" />
+                        <MenuItem text="Open"  accelerator="Shortcut+O"/>
+                        <MenuItem text="Save"  accelerator="Shortcut+S"/>
+                        <MenuItem text="Save As"/>
+                    </Menu>
+                    <Menu id="menuE" text="Edit" >
+                        <MenuItem fx:id="UndoMI" text="Undo"  onAction="#undo" disable="true" accelerator="Shortcut+Z"/>
+                        <MenuItem fx:id="RedoMI" text="Redo"  onAction="#redo" disable="true" accelerator="Shortcut+A"/>
+                        <MenuItem fx:id="ResizeMI" text="Resize"/>
+                    </Menu>
+                    <Menu id="menuI" text="Instruments">
+                        <MenuItem fx:id="SettingsMI" text="Settings"/>
+                    </Menu>
+                    <Menu id="menuC" text="Connection"/>
+                </MenuBar>
+            </HBox>
+            <HBox styleClass="btnBox">
+                <Button fx:id="connectBtn" onAction="#connect" text="Connect"/>
+                <Button fx:id="hostBtn" onAction="#host" text="Host" />
+                <Button fx:id="undoBtn" onAction="#undo" text="Undo" />
+                <Button fx:id="redoBtn" onAction="#redo" text="Redo" />
+                <TextField fx:id="brushSizeText" prefWidth="50" text=""/>
+            </HBox>
+        </VBox>
     </top>
     <center>
         <ScrollPane fx:id="canvasPane" hbarPolicy="AS_NEEDED" vbarPolicy="AS_NEEDED">
@@ -26,7 +43,7 @@
         </ScrollPane>
     </center>
     <left>
-        <VBox fx:id="leftBox">
+        <VBox fx:id="leftBox" styleClass="box">
             <fx:define>
                 <ToggleGroup fx:id="toolGroup"/>
             </fx:define>
@@ -36,75 +53,7 @@
         </VBox>
     </left>
     <right>
-=======-->
-<?import javafx.scene.image.ImageView?>
-
-
-
-<BorderPane fx:controller="ru.mr123150.Controller" fx:id="rootPane" xmlns:fx="http://javafx.com/fxml" stylesheets="@./style1.css">
-<!--<AnchorPane fx:controller="ru.mr123150.Controller" fx:id = "rootPane" xmlns:fx="http://javafx.com/fxml" stylesheets="@./style1.css">
-
-<children>-->
-
-
-    <!--<BorderPane fx:id="borderPane1">-->
-        <top>
-            <VBox fx:id="topBox">
-                <HBox>
-                    <MenuBar fx:id="menuBar" styleClass="menu-bar" useSystemMenuBar="true">
-                        <menus>
-                            <Menu id="menuF" text="File">
-                                <items>
-                                    <MenuItem text="New"   accelerator="Shortcut+N" />
-                                    <MenuItem text="Open"  accelerator="Shortcut+O"/>
-                                    <MenuItem text="Save"  accelerator="Shortcut+S"/>
-                                    <MenuItem text="Save As"/>
-                                </items>
-                            </Menu>
-                            <Menu id="menuE" text="Edit" >
-                                <items>
-                                    <MenuItem fx:id="UndoMI" text="Undo"  onAction="#undo" disable="true" accelerator="Shortcut+Z"/>
-                                    <MenuItem fx:id="RedoMI" text="Redo"  onAction="#redo" disable="true" accelerator="Shortcut+A"/>
-                                    <MenuItem fx:id="ResizeMI" text="Resize"/>
-                                </items>
-                            </Menu>
-                            <Menu id="menuI" text="Instruments">
-                                <items>
-                                    <MenuItem fx:id="SettingsMI" text="Settings"/>
-                                </items>
-                            </Menu>
-                            <Menu id="menuC" text="Connection"/>
-                        </menus>
-                    </MenuBar>
-                </HBox>
-                <HBox>
-                    <Button fx:id="connectBtn" onAction="#connect" text="Connect"/>
-                    <Button fx:id="hostBtn" onAction="#host" text="Host" />
-                    <Button fx:id="undoBtn" onAction="#undo" text="Undo" />
-                    <Button fx:id="redoBtn" onAction="#redo" text="Redo" />
-                    <TextField fx:id="brushSizeText" prefWidth="50" text=""/>
-                </HBox>
-            </VBox>
-        </top>
-        <center>
-            <ScrollPane fx:id="canvasPane" hbarPolicy="AS_NEEDED" vbarPolicy="AS_NEEDED">
-                <content>
-                    <Canvas fx:id="canvas" width="500.0" height="500.0"/>
-                </content>
-            </ScrollPane>
-        </center>
-        <left>
-            <VBox fx:id="leftBox">
-                <fx:define>
-                    <ToggleGroup fx:id="toolGroup"/>
-                </fx:define>
-                <ToggleButton toggleGroup="$toolGroup" text="Brush" selected="true" onAction="#toolBrush"/>
-                <ToggleButton toggleGroup="$toolGroup" text="Eraser" onAction="#toolEraser"/>
-                <ToggleButton toggleGroup="$toolGroup" text="Picker" onAction="#toolPicker"/>
-            </VBox>
-        </left>
-        <right>
-        <VBox fx:id="rightBox">
+        <VBox fx:id="rightBox" styleClass="box">
             <Canvas fx:id="hcolor" width="250.0" height="15.0" />
             <Canvas fx:id="color" width="250.0" height="250.0" />
             <HBox spacing="5">
@@ -129,26 +78,8 @@
         </VBox>
     </right>
     <bottom>
-        <HBox fx:id="bottomBox" alignment="TOP_LEFT">
+        <HBox fx:id="bottomBox" alignment="TOP_LEFT" styleClass="box">
             <Label fx:id="statusLabel" text="Loading app"/>
         </HBox>
     </bottom>
-
-
-
-
-        <!--<left>
-            <ToolBar fx:id="Left_toolBar" orientation="VERTICAL" >
-                <MenuButton fx:id="InstrumentLTBtn" text="Brush" contentDisplay="LEFT" popupSide="LEFT">
-                    <MenuItem fx:id="BrushLTMI" text="Brush"/>
-                    <MenuItem fx:id="PencilLTMI" text="Pencil"/>
-                </MenuButton>
-                <Button fx:id="EraserLTMI" />
-            </ToolBar>
-        </left>-->
-    </BorderPane>
-<!--</children>
-<stylesheets>
-    <URL value = "@style1.css"/>
-</stylesheets>
-</AnchorPane>-->
+</BorderPane>

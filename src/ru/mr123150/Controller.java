@@ -36,7 +36,7 @@ public class Controller implements Initializable{
     @FXML Canvas color;
     @FXML Canvas curColor;
 
-    //@FXML BorderPane rootPane;
+    @FXML BorderPane rootPane;
     @FXML VBox topBox;
     @FXML VBox leftBox;
     @FXML VBox rightBox;
@@ -49,30 +49,6 @@ public class Controller implements Initializable{
     @FXML MenuBar menuBar;
     @FXML MenuItem UndoMI;
     @FXML MenuItem RedoMI;
-
-
-
-
-    //@FXML AnchorPane rootPane;
-    @FXML BorderPane rootPane;
-    @FXML BorderPane borderPane1;
-    //@FXML Pane canvasPane;
-
-
-
-    @FXML ToolBar toolBar;
-    @FXML Label brushSizeLabel;
-    @FXML Slider brushSizeSlider;
-    @FXML Spinner brushSizeSpinner;
-
-
-    @FXML ToolBar Left_toolBar;
-
-    @FXML Button EraserLTMI;
-    @FXML MenuButton InstrumentLTBtn;
-    @FXML MenuItem BrushLTMI;
-    @FXML MenuItem PencilLTMI;
-
 
     FileChooser fileChooser;
 
@@ -138,8 +114,14 @@ public class Controller implements Initializable{
         brushSizeText.setText(me().size()+"");
 
         undo.add(canvas.snapshot(null,null));
-        if(undo.size()<=1)UndoMI.setDisable(true);
-        if(redo.isEmpty())RedoMI.setDisable(true);
+        if(undo.size()<=1){
+            undoBtn.setDisable(true);
+            UndoMI.setDisable(true);
+        }
+        if(redo.isEmpty()){
+            redoBtn.setDisable(true);
+            RedoMI.setDisable(true);
+        }
         userScroll.init(this);
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             try{
@@ -149,7 +131,10 @@ public class Controller implements Initializable{
             catch(NullPointerException e){}
             send("DRAW;CLICK;" + event.getX() + ";" + event.getY());
             undo.add(canvas.snapshot(null, null));
-            if (undo.size() > 1) UndoMI.setDisable(false);
+            if (undo.size() > 1) {
+                undoBtn.setDisable(false);
+                UndoMI.setDisable(false);
+            }
         });
 
         statusLabel.setText("");
@@ -329,8 +314,14 @@ public class Controller implements Initializable{
         redo.add(undo.lastElement());
         undo.remove(undo.size()-1);
         gc.drawImage(undo.lastElement(),0,0);
-        if(undo.size()<=1)UndoMI.setDisable(true);
-        if(!redo.isEmpty())RedoMI.setDisable(false);
+        if (undo.size() <= 1) {
+            undoBtn.setDisable(true);
+            UndoMI.setDisable(true);
+        }
+        if (!redo.isEmpty()) {
+            redoBtn.setDisable(false);
+            RedoMI.setDisable(false);
+        }
         if(send)send("CHANGE;UNDO");
     }
 
@@ -343,8 +334,14 @@ public class Controller implements Initializable{
         undo.add(redo.lastElement());
         gc.drawImage(redo.lastElement(),0,0);
         redo.remove(redo.size()-1);
-        if(redo.isEmpty())RedoMI.setDisable(true);
-        if(undo.size()>1)UndoMI.setDisable(false);
+        if (undo.size() > 1) {
+            undoBtn.setDisable(false);
+            UndoMI.setDisable(false);
+        }
+        if (redo.isEmpty()) {
+            redoBtn.setDisable(true);
+            RedoMI.setDisable(true);
+        }
         if(send)send("CHANGE;REDO");
     }
 
@@ -569,7 +566,10 @@ public class Controller implements Initializable{
                         case "CLICK":
                             conn.users.get(user_id).dot(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
                             undo.add(canvas.snapshot(null,null));
-                            if(undo.size()>1)UndoMI.setDisable(false);
+                            if (undo.size() > 1) {
+                                undoBtn.setDisable(false);
+                                UndoMI.setDisable(false);
+                            }
                             if (conn.isHost()) send(str,false);
                             break;
                         case "PRESS":

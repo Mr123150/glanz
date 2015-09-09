@@ -1,11 +1,37 @@
-﻿.backgroundPane {
-    -fx-background-color: #474747;
+﻿#topBox, #bottomBox, #leftBox, #rightBox {
+    /*next rule doesn't work without it*/
 }
 
-ToolBar{
-    -fx-background-color: #474747;
+HBox, VBox{
+    -fx-background-color: #38688f;
 }
 
-ToolBar Label{
+.btnBox{
+    -fx-padding: 2px;
+    -fx-spacing: 2px;
+}
+
+HBox Label, VBox Label{
     -fx-text-fill: #eee;
 }
+
+Button{
+    -fx-background-color: #38688f;
+    -fx-border-color: #b1cbe0;
+    -fx-border-radius: 3px;
+    -fx-border-width: 1.5px;
+    -fx-text-fill: #b1cbe0;
+}
+
+Button:hover, Button:pressed{
+    -fx-background-color: #376991;
+    -fx-border-color: #669ac4;
+}
+
+Button:disabled{
+    -fx-background-color: #689bc4;
+    -fx-border-color: #1b3245;
+    -fx-text-fill: #1b3245;
+}
+
+
