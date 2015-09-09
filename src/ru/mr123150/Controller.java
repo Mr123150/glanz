@@ -37,7 +37,7 @@ public class Controller implements Initializable{
     @FXML Canvas curColor;
 
     //@FXML BorderPane rootPane;
-    @FXML HBox topBox;
+    @FXML VBox topBox;
     @FXML VBox leftBox;
     @FXML VBox rightBox;
     @FXML HBox bottomBox;
@@ -53,7 +53,8 @@ public class Controller implements Initializable{
 
 
 
-    @FXML AnchorPane rootPane;
+    //@FXML AnchorPane rootPane;
+    @FXML BorderPane rootPane;
     @FXML BorderPane borderPane1;
     //@FXML Pane canvasPane;
 
