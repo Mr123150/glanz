@@ -1,3 +1,6 @@
-<fx:root type="javafx.scene.control.ScrollPane" xmlns:fx="http://javafx.com/fxml">
-
+<?import javafx.scene.layout.VBox?>
+<fx:root type="javafx.scene.control.ScrollPane" xmlns:fx="http://javafx.com/fxml" hbarPolicy="NEVER">
+    <content>
+        <VBox fx:id="listBox"></VBox>
+    </content>
 </fx:root>

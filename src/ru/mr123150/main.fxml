@@ -6,7 +6,7 @@
 
 <BorderPane fx:controller="ru.mr123150.Controller" fx:id="rootPane" xmlns:fx="http://javafx.com/fxml" stylesheets="@./style1.css">
     <top>
-        <VBox fx:id="topBox" styleClass="box">
+        <VBox fx:id="topBox">
             <HBox>
                 <MenuBar fx:id="menuBar" styleClass="menu-bar" useSystemMenuBar="true">
                     <Menu id="menuF" text="File">
@@ -43,7 +43,7 @@
         </ScrollPane>
     </center>
     <left>
-        <VBox fx:id="leftBox" styleClass="box">
+        <VBox fx:id="leftBox" styleClass="btnBox">
             <fx:define>
                 <ToggleGroup fx:id="toolGroup"/>
             </fx:define>
@@ -53,7 +53,7 @@
         </VBox>
     </left>
     <right>
-        <VBox fx:id="rightBox" styleClass="box">
+        <VBox fx:id="rightBox" styleClass="btnBox">
             <Canvas fx:id="hcolor" width="250.0" height="15.0" />
             <Canvas fx:id="color" width="250.0" height="250.0" />
             <HBox spacing="5">
@@ -72,13 +72,13 @@
             <Label text="Chat" />
             <ScrollList fx:id="chatScroll" prefWidth="250" prefHeight="150"/>
             <HBox>
-                <TextField fx:id="chatText" prefWidth="200"/>
-                <Button fx:id="chatSend" prefWidth="50" onAction="#chat" text="Send"/>
+                <TextField fx:id="chatText" prefWidth="190"/>
+                <Button fx:id="chatSend" prefWidth="60" onAction="#chat" text="Send"/>
             </HBox>
         </VBox>
     </right>
     <bottom>
-        <HBox fx:id="bottomBox" alignment="TOP_LEFT" styleClass="box">
+        <HBox fx:id="bottomBox" alignment="TOP_LEFT">
             <Label fx:id="statusLabel" text="Loading app"/>
         </HBox>
     </bottom>

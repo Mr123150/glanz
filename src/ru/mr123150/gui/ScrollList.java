@@ -1,5 +1,6 @@
 package ru.mr123150.gui;
 
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
@@ -13,7 +14,7 @@ import java.util.Vector;
  */
 public class ScrollList extends ScrollPane {
 
-    protected VBox listBox;
+    @FXML protected VBox listBox;
     protected Vector<ListNode> list;
     protected Controller root;
 
@@ -29,8 +30,6 @@ public class ScrollList extends ScrollPane {
         }
 
         list=new Vector<>();
-        listBox=new VBox();
-        setContent(listBox);
     }
 
     public void init(Controller root){this.root=root;}
