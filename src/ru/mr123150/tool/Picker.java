@@ -12,10 +12,11 @@ public class Picker extends Tool {
     public Picker(){
         title="PICKER";
         returnable=true;
+        action=false;
         cursor=Cursor.CROSSHAIR;
     }
 
-    public Color lineTo(double x, double y){
+    public Color lineTo(double fromX, double fromY, double x, double y){
         return gc.getCanvas().snapshot(null,null).getPixelReader().getColor((int) x, (int) y);
     }
 

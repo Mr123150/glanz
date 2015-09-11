@@ -12,6 +12,7 @@ public abstract class Tool {
     protected GraphicsContext gc;
     protected String title="NULL";
     protected boolean returnable=false;
+    protected boolean action=true;
     protected Cursor cursor=null;
     public Tool(){}
 
@@ -23,7 +24,9 @@ public abstract class Tool {
 
     public boolean returnable(){return this.returnable;}
 
-    public abstract Color lineTo(double x, double y);
+    public boolean action(){return action;}
+
+    public abstract Color lineTo(double fromX, double fromY, double x, double y);
 
     public abstract Color dot(double x, double y);
 

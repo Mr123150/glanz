@@ -117,13 +117,15 @@ public class User {
         gc.setStroke(color());
         gc.setLineWidth(size);
         gc.moveTo(this.x,this.y);
+        double tmpX=this.x;
+        double tmpY=this.y;
         if(tool==null)tool=new Brush();//todo tmp
         setCoord(x,y);
         if(tool.returnable()) {
-            return tool.lineTo(x, y);
+            return tool.lineTo(tmpX,tmpY,x, y);
         }
         else {
-            setColor(tool.lineTo(x,y));
+            setColor(tool.lineTo(tmpX,tmpY,x,y));
             return null;
         }
     }

@@ -2,7 +2,6 @@ package ru.mr123150;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
@@ -28,7 +27,6 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Vector;
-import javafx.scene.image.*;
 
 public class Controller implements Initializable{
     @FXML Canvas canvas;
@@ -130,10 +128,12 @@ public class Controller implements Initializable{
             }
             catch(NullPointerException e){}
             send("DRAW;CLICK;" + event.getX() + ";" + event.getY());
-            undo.add(canvas.snapshot(null, null));
-            if (undo.size() > 1) {
-                undoBtn.setDisable(false);
-                UndoMI.setDisable(false);
+            if(me().tool().action()) {
+                undo.add(canvas.snapshot(null, null));
+                if (undo.size() > 1) {
+                    undoBtn.setDisable(false);
+                    UndoMI.setDisable(false);
+                }
             }
         });
 
@@ -564,7 +564,7 @@ public class Controller implements Initializable{
 
                     switch (arr[1]) {
                         case "CLICK":
-                            conn.users.get(user_id).dot(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
+                            if(conn.users.get(user_id).tool().action())conn.users.get(user_id).dot(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
                             undo.add(canvas.snapshot(null,null));
                             if (undo.size() > 1) {
                                 undoBtn.setDisable(false);

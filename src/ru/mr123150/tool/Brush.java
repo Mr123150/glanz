@@ -11,7 +11,7 @@ public class Brush extends Tool {
         this.title="BRUSH";
     }
 
-    public Color lineTo(double x, double y){
+    public Color lineTo(double fromX, double fromY, double x, double y){
         gc.lineTo(x,y);
         gc.stroke();
         return null;

@@ -8,7 +8,7 @@ import javafx.scene.paint.Color;
 public class Eraser extends Tool {
     public Eraser(){this.title="ERASER";}
 
-    public Color lineTo(double x, double y){
+    public Color lineTo(double fromX, double fromY, double x, double y){
         gc.setStroke(Color.WHITE);
         gc.lineTo(x,y);
         gc.stroke();
