@@ -15,6 +15,10 @@ Label{
     -fx-text-fill: #b1cbe0;
 }
 
+HBox.btnBox{
+    -fx-alignment: center-left;
+}
+
 TextField{
     -fx-background-color: #0d1821;
     -fx-border-color: #b1cbe0;

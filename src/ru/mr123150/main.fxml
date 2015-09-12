@@ -4,6 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import ru.mr123150.gui.ScrollList?>
 
+<?import javafx.geometry.Insets?>
 <BorderPane fx:controller="ru.mr123150.Controller" fx:id="rootPane" xmlns:fx="http://javafx.com/fxml" stylesheets="@./style1.css">
     <top>
         <VBox fx:id="topBox">
@@ -31,14 +32,19 @@
                 <Button fx:id="hostBtn" onAction="#host" text="Host" />
                 <Button fx:id="undoBtn" onAction="#undo" text="Undo" />
                 <Button fx:id="redoBtn" onAction="#redo" text="Redo" />
+                <Label text="Brush size:"/>
                 <TextField fx:id="brushSizeText" prefWidth="50" text=""/>
+                <Label text="Scale:"/>
+                <TextField fx:id="scaleText" prefWidth="50" text=""/>
             </HBox>
         </VBox>
     </top>
     <center>
         <ScrollPane fx:id="canvasPane" hbarPolicy="AS_NEEDED" vbarPolicy="AS_NEEDED">
             <content>
-                <Canvas fx:id="canvas" width="500.0" height="500.0"/>
+                <AnchorPane>
+                    <Canvas fx:id="canvas" width="500.0" height="500.0" AnchorPane.leftAnchor="100" AnchorPane.topAnchor="50" AnchorPane.bottomAnchor="50" AnchorPane.rightAnchor="100"/>
+                </AnchorPane>
             </content>
         </ScrollPane>
     </center>
