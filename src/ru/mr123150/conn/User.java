@@ -25,6 +25,8 @@ public class User {
     protected double x=0;
     protected double y=0;
 
+    protected double scale=1;
+
     protected GraphicsContext gc=null;
 
     protected Tool tool=null;
@@ -102,6 +104,10 @@ public class User {
         this.x=x;
         this.y=y;
     }
+
+    public double scale(){return scale;}
+
+    public void setScale(double scale){this.scale=scale;}
 
     public Tool tool(){return tool;}
 

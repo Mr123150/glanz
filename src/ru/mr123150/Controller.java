@@ -51,6 +51,7 @@ public class Controller implements Initializable{
     FileChooser fileChooser;
 
     @FXML TextField brushSizeText;
+    @FXML TextField scaleText;
 
     @FXML TextField hColorText;
     @FXML TextField sColorText;
@@ -202,11 +203,21 @@ public class Controller implements Initializable{
             try{
                 size=Double.parseDouble(newValue);
             }
-            catch (NumberFormatException e){
-
-            }
+            catch (NumberFormatException e){}
             me().setSize(size);
         });
+
+        scaleText.textProperty().addListener((observable,oldValue,newValue)->{
+            double scale=1;
+            try{
+                scale=Double.parseDouble(newValue)/100;
+            }
+            catch(NumberFormatException e){}
+            me().setScale(scale);
+            scaleCanvas(scale);
+        });
+
+
 
         spinner.setTitle("Please wait");
         spinner.setContentText("Waiting for host response");
@@ -242,7 +253,16 @@ public class Controller implements Initializable{
         undo.add(canvas.snapshot(null,null));
         gc.drawImage(undo.get(0),0,0);
     }
-    
+
+    public void scaleCanvas(double scale){
+        canvas.setScaleX(scale);
+        canvas.setScaleY(scale);
+        AnchorPane.setLeftAnchor(canvas, scale>1?(scale-1)*canvas.getWidth()+100:0);
+        AnchorPane.setRightAnchor(canvas, scale>1?(scale-1)*canvas.getWidth()+100:0);
+        AnchorPane.setTopAnchor(canvas, scale>1?(scale-1)*canvas.getHeight()+100:0);
+        AnchorPane.setBottomAnchor(canvas, scale>1?(scale-1)*canvas.getHeight()+100:0);
+    }
+
     public void setColor(double h, double s, double b){
         if(h<0)h=0;
         if(h>360)h=360;

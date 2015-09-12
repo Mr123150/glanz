@@ -35,7 +35,7 @@
                 <Label text="Brush size:"/>
                 <TextField fx:id="brushSizeText" prefWidth="50" text=""/>
                 <Label text="Scale:"/>
-                <TextField fx:id="scaleText" prefWidth="50" text=""/>
+                <TextField fx:id="scaleText" prefWidth="50" text="100"/>
             </HBox>
         </VBox>
     </top>
@@ -43,7 +43,7 @@
         <ScrollPane fx:id="canvasPane" hbarPolicy="AS_NEEDED" vbarPolicy="AS_NEEDED">
             <content>
                 <AnchorPane>
-                    <Canvas fx:id="canvas" width="500.0" height="500.0" AnchorPane.leftAnchor="100" AnchorPane.topAnchor="50" AnchorPane.bottomAnchor="50" AnchorPane.rightAnchor="100"/>
+                    <Canvas fx:id="canvas" width="500.0" height="500.0"/>
                 </AnchorPane>
             </content>
         </ScrollPane>

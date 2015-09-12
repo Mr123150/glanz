@@ -19,6 +19,10 @@ HBox.btnBox{
     -fx-alignment: center-left;
 }
 
+#canvasPane AnchorPane{
+    -fx-background-color: #0d1821;
+}
+
 TextField{
     -fx-background-color: #0d1821;
     -fx-border-color: #b1cbe0;
