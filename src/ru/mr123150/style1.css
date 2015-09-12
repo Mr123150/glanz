@@ -3,7 +3,7 @@
 }
 
 HBox, VBox{
-    -fx-background-color: #38688f;
+    -fx-background-color: #1b3245;
 }
 
 .btnBox{
@@ -11,27 +11,56 @@ HBox, VBox{
     -fx-spacing: 2px;
 }
 
-HBox Label, VBox Label{
-    -fx-text-fill: #eee;
-}
-
-Button{
-    -fx-background-color: #38688f;
-    -fx-border-color: #b1cbe0;
-    -fx-border-radius: 3px;
-    -fx-border-width: 1.5px;
+Label{
     -fx-text-fill: #b1cbe0;
 }
 
-Button:hover, Button:pressed{
-    -fx-background-color: #376991;
-    -fx-border-color: #669ac4;
+TextField{
+    -fx-background-color: #0d1821;
+    -fx-border-color: #b1cbe0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+    -fx-text-fill: #b1cbe0;
 }
 
-Button:disabled{
-    -fx-background-color: #689bc4;
-    -fx-border-color: #1b3245;
-    -fx-text-fill: #1b3245;
+#leftBox{
+    -fx-alignment: top-center;
+}
+
+#leftBox ToggleButton{
+    -fx-pref-width: 60px;
+}
+
+Button, ToggleButton{
+    -fx-background-color: transparent;
+    -fx-border-color: #b1cbe0;
+    -fx-border-radius: 3px;
+    -fx-border-width: 1px;
+    -fx-text-fill: #b1cbe0;
+}
+
+Button:hover, ToggleButton:hover{
+    -fx-background-color: #2a4e6b;
+}
+
+Button:pressed, ToggleButton:pressed, ToggleButton:selected{
+    -fx-background-color: #0d1821;
+    -fx-border-color: #2a4e6b;
+}
+
+Button:disabled, ToggleButton:disabled{
+    -fx-background-color: #376991;
+    -fx-border-color: #b1cbe0;
+    -fx-text-fill: #b1cbe0;
+}
+
+ScrollList{
+    -fx-background-color: transparent;
+    -fx-background: #0d1821;
+}
+
+ScrollList VBox{
+    -fx-background-color: transparent;
 }
 
 
